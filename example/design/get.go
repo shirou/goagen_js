@@ -7,7 +7,6 @@ import (
 
 var GetParamPayload = Type("GetParamPayload", func() {
 	Attribute("ParamStr", String)
-
 })
 
 var _ = Resource("get", func() {
@@ -31,7 +30,10 @@ var _ = Resource("get", func() {
 				Description("path_params param int")
 				Maximum(10)
 			})
-			Param("ParamStr", String)
+			Param("ParamStr", String, func() {
+				Description("path_params param str. This is same name in the payload.")
+			})
+			Required("ParamStr")
 		})
 		Payload(GetParamPayload, func() {
 		})

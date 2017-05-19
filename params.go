@@ -51,20 +51,20 @@ func parseAction(action *design.ActionDefinition, target string) (ParamsDefiniti
 
 	if action.PathParams() != nil {
 		m := action.PathParams().Type.ToObject()
-		for a, l := range m {
-			ret.Path = append(ret.Path, newParam(action, target, a, l))
-			kind := convertTypeString(l.Type.Kind(), target)
-			ret.Validator.constraint[a] = parseConstraint(kind, l.Validation)
+		for a, att := range m {
+			ret.Path = append(ret.Path, newParam(action, target, a, att))
+			kind := convertTypeString(att.Type.Kind(), target)
+			ret.Validator.constraint[a] = parseConstraint(kind, att.Validation, att.IsRequired(a))
 		}
 	}
 
 	if action.QueryParams != nil {
 		m := action.QueryParams.Type.ToObject()
 		pv := make(map[string]Constraint)
-		for a, l := range m {
-			kind := convertTypeString(l.Type.Kind(), target)
-			ret.Query = append(ret.Query, newParam(action, target, a, l))
-			pv[a] = parseConstraint(kind, l.Validation)
+		for a, att := range m {
+			kind := convertTypeString(att.Type.Kind(), target)
+			ret.Query = append(ret.Query, newParam(action, target, a, att))
+			pv[a] = parseConstraint(kind, att.Validation, att.IsRequired(a))
 		}
 		if len(pv) > 0 {
 			ret.Validator.constraint["payload"] = pv
@@ -194,11 +194,11 @@ type Param struct {
 
 type Params []Param
 
-func newParam(action *design.ActionDefinition, target string, a string, l *design.AttributeDefinition) Param {
+func newParam(action *design.ActionDefinition, target string, a string, att *design.AttributeDefinition) Param {
 	return Param{
-		original:    l,
+		original:    att,
 		Name:        codegen.Goify(a, false),
-		Kind:        convertTypeString(l.Type.Kind(), target),
-		Description: l.Description,
+		Kind:        convertTypeString(att.Type.Kind(), target),
+		Description: att.Description,
 	}
 }

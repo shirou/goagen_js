@@ -2,7 +2,6 @@ package goagen_js
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/goadesign/goa/dslengine"
 )
@@ -40,15 +39,19 @@ func newValidator(name string) Validator {
 	}
 }
 
-func parseConstraint(kind string, o *dslengine.ValidationDefinition) Constraint {
+func parseConstraint(kind string, o *dslengine.ValidationDefinition, required bool) Constraint {
 	ret := Constraint{
 		Kind: kind,
+	}
+	// TODO: IsRequired is not work.
+	// https://godoc.org/github.com/goadesign/goa/design#AttributeDefinition.IsRequired
+	if required {
+		ret.Required = &required
 	}
 
 	if o == nil {
 		return ret
 	}
-	fmt.Printf("%#v\n", o.Required)
 
 	if o.Values != nil {
 		ret.Enum = o.Values

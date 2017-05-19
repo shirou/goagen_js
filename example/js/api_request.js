@@ -29,7 +29,7 @@ export function GetIntGet(payload) {
 // Get Method with params in path
 // 
 // paramInt(number): path_params param int
-// paramStr(string): 
+// paramStr(string): path_params param str. This is same name in the payload.
 export function PathParamsGet(paramInt, paramStr) {
   const url = urlPrefix + "/get/int/${paramInt}/${paramStr}";
   let errors = {};
