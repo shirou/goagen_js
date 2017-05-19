@@ -1,0 +1,31 @@
+{
+  "name": "goagen_js",
+  "description": "goagen_js",
+  "version": "1.0.0",
+  "author": "shirou",
+  "private": true,
+  "scripts": {
+    "lint": "$(npm bin)/eslint js/*.js",
+    "watch": "NODE_ENV=development webpack --progress --hide-modules --watch"
+  },
+  "dependencies": {
+    "validate.js": "^0.11.1",
+    "whatwg-fetch": "^2.0.2"
+  },
+  "devDependencies": {
+    "babel-core": "^6.0.0",
+    "babel-loader": "^6.0.0",
+    "babel-preset-es2015": "^6.0.0",
+    "babel-preset-stage-2": "^6.22.0",
+    "cross-env": "^3.0.0",
+    "eslint": "^3.17.1",
+    "eslint-config-airbnb": "^15.0.1",
+    "eslint-config-vue": "^2.0.2",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^5.0.3",
+    "eslint-plugin-react": "^7.0.1",
+    "eslint-plugin-vue": "^2.0.1",
+    "webpack": "^2.2.0",
+    "webpack-dev-server": "^2.2.0"
+  }
+}
