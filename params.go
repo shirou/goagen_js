@@ -119,7 +119,7 @@ func (p ParamsDefinition) FuncName() string {
 		v = "Get"
 	}
 
-	return v + p.Name
+	return p.Name + v
 }
 
 func (p ParamsDefinition) FuncArgs(target string) string {

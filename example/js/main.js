@@ -7,12 +7,12 @@ const payload = {
   int_max: 1,
 };
 
-//console.log(v.validate(v.GetGetInt.payload, payload));
+//console.log(v.validate(v.GetIntGet.payload, payload));
 
-console.log(v.validate(v.GetPathParams.ParamInt, 10000));
+console.log(v.validate(v.PathParamsGet.ParamInt, 10000));
 /*
 
-api.GetGetInt(payload).then((response) => {
+api.GetIntGet(payload).then((response) => {
   if (response.status !== 200){
     console.log("error", response.status);
     throw response.json();

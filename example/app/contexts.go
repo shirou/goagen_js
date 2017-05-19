@@ -185,6 +185,7 @@ type PathParamsGetContext struct {
 	*goa.RequestData
 	ParamInt int
 	ParamStr string
+	Payload  *PathParamsGetPayload
 }
 
 // NewPathParamsGetContext parses the incoming request URL and body, performs validations and creates the
@@ -214,6 +215,25 @@ func NewPathParamsGetContext(ctx context.Context, r *http.Request, service *goa.
 		rctx.ParamStr = rawParamStr
 	}
 	return &rctx, err
+}
+
+// pathParamsGetPayload is the get path_params action payload.
+type pathParamsGetPayload struct {
+	ParamStr *string `form:"ParamStr,omitempty" json:"ParamStr,omitempty" xml:"ParamStr,omitempty"`
+}
+
+// Publicize creates PathParamsGetPayload from pathParamsGetPayload
+func (payload *pathParamsGetPayload) Publicize() *PathParamsGetPayload {
+	var pub PathParamsGetPayload
+	if payload.ParamStr != nil {
+		pub.ParamStr = payload.ParamStr
+	}
+	return &pub
+}
+
+// PathParamsGetPayload is the get path_params action payload.
+type PathParamsGetPayload struct {
+	ParamStr *string `form:"ParamStr,omitempty" json:"ParamStr,omitempty" xml:"ParamStr,omitempty"`
 }
 
 // OK sends a HTTP response with status code 200.

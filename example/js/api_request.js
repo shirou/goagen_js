@@ -11,11 +11,11 @@ const urlPrefix = scheme + '://' + host;
 // GetInt
 // Get Method
 // 
-export function GetGetInt(payload) {
+export function GetIntGet(payload) {
   const url = urlPrefix + "/get/int";
   let errors = {};
   let ret;
-  ret = v.validate(v.GetGetInt.payload, payload);
+  ret = v.validate(v.GetIntGet.payload, payload);
   if (ret !== null) {
      errors.payload = ret;
   }
@@ -30,15 +30,15 @@ export function GetGetInt(payload) {
 // 
 // paramInt(number): path_params param int
 // paramStr(string): 
-export function GetPathParams(paramInt, paramStr) {
+export function PathParamsGet(paramInt, paramStr) {
   const url = urlPrefix + "/get/int/${paramInt}/${paramStr}";
   let errors = {};
   let ret;
-  ret = v.validate(v.GetPathParams.paramInt, paramInt);
+  ret = v.validate(v.PathParamsGet.paramInt, paramInt);
   if (ret !== null) {
      errors.paramInt = ret;
   }
-  ret = v.validate(v.GetPathParams.paramStr, paramStr);
+  ret = v.validate(v.PathParamsGet.paramStr, paramStr);
   if (ret !== null) {
      errors.paramStr = ret;
   }
@@ -51,7 +51,7 @@ export function GetPathParams(paramInt, paramStr) {
 // Without
 // Get Method without params
 // 
-export function GetWithout() {
+export function WithoutGet() {
   const url = urlPrefix + "/get";
   return get(url);
 }

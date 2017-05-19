@@ -409,11 +409,11 @@ func GetIntGetUnauthorized(t goatest.TInterface, ctx context.Context, service *g
 	return rw
 }
 
-// PathParamsGetInternalServerError runs the method PathParams of the given controller with the given parameters.
+// PathParamsGetInternalServerError runs the method PathParams of the given controller with the given parameters and payload.
 // It returns the response writer so it's possible to inspect the response headers.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func PathParamsGetInternalServerError(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.GetController, paramInt int, paramStr string) http.ResponseWriter {
+func PathParamsGetInternalServerError(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.GetController, paramInt int, paramStr string, payload *app.PathParamsGetPayload) http.ResponseWriter {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -451,6 +451,7 @@ func PathParamsGetInternalServerError(t goatest.TInterface, ctx context.Context,
 	if _err != nil {
 		panic("invalid test data " + _err.Error()) // bug
 	}
+	pathParamsCtx.Payload = payload
 
 	// Perform action
 	_err = ctrl.PathParams(pathParamsCtx)
@@ -467,11 +468,11 @@ func PathParamsGetInternalServerError(t goatest.TInterface, ctx context.Context,
 	return rw
 }
 
-// PathParamsGetOK runs the method PathParams of the given controller with the given parameters.
+// PathParamsGetOK runs the method PathParams of the given controller with the given parameters and payload.
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func PathParamsGetOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.GetController, paramInt int, paramStr string) (http.ResponseWriter, *app.Inttest) {
+func PathParamsGetOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.GetController, paramInt int, paramStr string, payload *app.PathParamsGetPayload) (http.ResponseWriter, *app.Inttest) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -509,6 +510,7 @@ func PathParamsGetOK(t goatest.TInterface, ctx context.Context, service *goa.Ser
 	if _err != nil {
 		panic("invalid test data " + _err.Error()) // bug
 	}
+	pathParamsCtx.Payload = payload
 
 	// Perform action
 	_err = ctrl.PathParams(pathParamsCtx)
@@ -537,11 +539,11 @@ func PathParamsGetOK(t goatest.TInterface, ctx context.Context, service *goa.Ser
 	return rw, mt
 }
 
-// PathParamsGetOKSecret runs the method PathParams of the given controller with the given parameters.
+// PathParamsGetOKSecret runs the method PathParams of the given controller with the given parameters and payload.
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func PathParamsGetOKSecret(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.GetController, paramInt int, paramStr string) (http.ResponseWriter, *app.InttestSecret) {
+func PathParamsGetOKSecret(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.GetController, paramInt int, paramStr string, payload *app.PathParamsGetPayload) (http.ResponseWriter, *app.InttestSecret) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -579,6 +581,7 @@ func PathParamsGetOKSecret(t goatest.TInterface, ctx context.Context, service *g
 	if _err != nil {
 		panic("invalid test data " + _err.Error()) // bug
 	}
+	pathParamsCtx.Payload = payload
 
 	// Perform action
 	_err = ctrl.PathParams(pathParamsCtx)
@@ -603,11 +606,11 @@ func PathParamsGetOKSecret(t goatest.TInterface, ctx context.Context, service *g
 	return rw, mt
 }
 
-// PathParamsGetUnauthorized runs the method PathParams of the given controller with the given parameters.
+// PathParamsGetUnauthorized runs the method PathParams of the given controller with the given parameters and payload.
 // It returns the response writer so it's possible to inspect the response headers.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func PathParamsGetUnauthorized(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.GetController, paramInt int, paramStr string) http.ResponseWriter {
+func PathParamsGetUnauthorized(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.GetController, paramInt int, paramStr string, payload *app.PathParamsGetPayload) http.ResponseWriter {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -645,6 +648,7 @@ func PathParamsGetUnauthorized(t goatest.TInterface, ctx context.Context, servic
 	if _err != nil {
 		panic("invalid test data " + _err.Error()) // bug
 	}
+	pathParamsCtx.Payload = payload
 
 	// Perform action
 	_err = ctrl.PathParams(pathParamsCtx)

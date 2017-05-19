@@ -129,10 +129,16 @@ func MountGetController(service *goa.Service, ctrl GetController) {
 		if err != nil {
 			return err
 		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*PathParamsGetPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
 		return ctrl.PathParams(rctx)
 	}
 	h = handleGetOrigin(h)
-	service.Mux.Handle("GET", "/get/int/:ParamInt/:ParamStr", ctrl.MuxHandler("path_params", h, nil))
+	service.Mux.Handle("GET", "/get/int/:ParamInt/:ParamStr", ctrl.MuxHandler("path_params", h, unmarshalPathParamsGetPayload))
 	service.LogInfo("mount", "ctrl", "Get", "action", "PathParams", "route", "GET /get/int/:ParamInt/:ParamStr")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -176,4 +182,14 @@ func handleGetOrigin(h goa.Handler) goa.Handler {
 
 		return h(ctx, rw, req)
 	}
+}
+
+// unmarshalPathParamsGetPayload unmarshals the request body into the context request data Payload field.
+func unmarshalPathParamsGetPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &pathParamsGetPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
 }

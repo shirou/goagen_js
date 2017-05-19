@@ -2,6 +2,7 @@ package goagen_js
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/goadesign/goa/dslengine"
 )
@@ -47,6 +48,7 @@ func parseConstraint(kind string, o *dslengine.ValidationDefinition) Constraint 
 	if o == nil {
 		return ret
 	}
+	fmt.Printf("%#v\n", o.Required)
 
 	if o.Values != nil {
 		ret.Enum = o.Values

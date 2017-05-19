@@ -45,7 +45,7 @@ const validatorModuleT = `export function validate(rule, actual) {
     if (rule.pattern && new RegExp(rule.pattern).test(actual)) {
       errors.pattern = InvalidPatternError;
     }
-    if (rule.enum{
+    if (rule.enum) {
       let found = false;
       for (let k in rule.enum) {
         if (k === actual) {found = true;}

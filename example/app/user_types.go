@@ -9,3 +9,22 @@
 // --version=v1.2.0-dirty
 
 package app
+
+// getParamPayload user type.
+type getParamPayload struct {
+	ParamStr *string `form:"ParamStr,omitempty" json:"ParamStr,omitempty" xml:"ParamStr,omitempty"`
+}
+
+// Publicize creates GetParamPayload from getParamPayload
+func (ut *getParamPayload) Publicize() *GetParamPayload {
+	var pub GetParamPayload
+	if ut.ParamStr != nil {
+		pub.ParamStr = ut.ParamStr
+	}
+	return &pub
+}
+
+// GetParamPayload user type.
+type GetParamPayload struct {
+	ParamStr *string `form:"ParamStr,omitempty" json:"ParamStr,omitempty" xml:"ParamStr,omitempty"`
+}

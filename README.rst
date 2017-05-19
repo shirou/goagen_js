@@ -63,7 +63,7 @@ In the `api_request.js`, each API function is generated and you can use just nor
 
   // This API is invoked with query parameter.
   // Query parameter should be passed as object.
-  api.GetFooBar(payload).then((response) => {
+  api.FooBarGet(payload).then((response) => {
     if (response.status !== 200){
       console.log("error", response.status);
     }
@@ -74,7 +74,7 @@ In the `api_request.js`, each API function is generated and you can use just nor
   // This API is invoked with Path Param and POST payload
   // To use this API, passing PathParam and JSON payload as object.
   // This API request to /v2/:fooID/:barType
-  api.PostFooParam(fooID, barType, payload).then((response) => {
+  api.FooParamPost(fooID, barType, payload).then((response) => {
     if (response.status !== 200){
       console.log("error", response.status);
     }
@@ -92,13 +92,13 @@ In the `api_validation.js`, there are many `rules` for each APIs and a `validate
   import * as v from "./api_validator.js";
 
   // validate Query Param
-  console.log(v.validate(v.GetFooBar.payload, {
+  console.log(v.validate(v.FooBarGet.payload, {
     id: 1,
     too_large_int: 99999,
   }));
 
   // validate Path Params
-  console.log(v.validate(v.GetFooBar.fooID, 99999));
+  console.log(v.validate(v.FooParamPost.fooID, 99999));
 
 This validate function is used in `api_request.js`. Also you can use to validate before request, for example Form Validation.
 

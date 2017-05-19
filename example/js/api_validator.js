@@ -1,4 +1,4 @@
-// This module exports functions that validate goagen_js API hosted at localhost:8080.
+// This module exports functions that validate goagen_js API params hosted at localhost:8080.
 
 export const RequiredError = "missing required parameter";
 export const InvalidEnumValueError = "invalid enum value";
@@ -8,7 +8,7 @@ export const InvalidRangeError = "range exceeded";
 export const InvalidLengthError = "length is exceeded or less";
 export const InvalidKindError = "invalid kind";
 
-export const GetGetInt = {
+export const GetIntGet = {
    "payload": {
      "int": {
        "kind": "number"
@@ -46,7 +46,7 @@ export const GetGetInt = {
    }
  };
 
-export const GetPathParams = {
+export const PathParamsGet = {
    "ParamInt": {
      "kind": "number",
      "maximum": 10
@@ -56,7 +56,7 @@ export const GetPathParams = {
    }
  };
 
-export const GetWithout = {};
+export const WithoutGet = {};
 export function validate(rule, actual) {
   let errors = {};
 
@@ -87,16 +87,14 @@ export function validate(rule, actual) {
     if (rule.pattern && new RegExp(rule.pattern).test(actual)) {
       errors.pattern = InvalidPatternError;
     }
-    if (rule.kind) {
+    if (rule.enum) {
       let found = false;
-      for (let k in rule.kind) {
+      for (let k in rule.enum) {
         if (k === actual) {found = true;}
       }
       if (found === false) {
         errors.enum = InvalidEnumValueError;
       }
-    }
-    if (rule.format) {
     }
   }
 

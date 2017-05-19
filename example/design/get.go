@@ -5,6 +5,11 @@ import (
 	. "github.com/goadesign/goa/design/apidsl"
 )
 
+var GetParamPayload = Type("GetParamPayload", func() {
+	Attribute("ParamStr", String)
+
+})
+
 var _ = Resource("get", func() {
 	BasePath("get")
 	Response(InternalServerError)
@@ -17,6 +22,7 @@ var _ = Resource("get", func() {
 		})
 		Response(Unauthorized)
 	})
+
 	Action("path_params", func() {
 		Description("Get Method with params in path")
 		Routing(GET("int/:ParamInt/:ParamStr"))
@@ -27,6 +33,9 @@ var _ = Resource("get", func() {
 			})
 			Param("ParamStr", String)
 		})
+		Payload(GetParamPayload, func() {
+		})
+
 		Response(OK, func() {
 			Media(IntTest)
 		})
