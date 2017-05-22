@@ -41,12 +41,15 @@ func parseActions(g *Generator) ([]ParamsDefinition, error) {
 }
 
 func parseAction(action *design.ActionDefinition, target string) (ParamsDefinition, error) {
+
+	name := codegen.Goify(action.Parent.Name, true) + codegen.Goify(action.Name, true)
+
 	ret := ParamsDefinition{
 		Action:    action,
-		Name:      codegen.Goify(action.Name, true),
+		Name:      name,
 		Path:      make(Params, 0),
 		Query:     make(Params, 0),
-		Validator: newValidator(codegen.Goify(action.Name, true)),
+		Validator: newValidator(name),
 	}
 
 	if action.PathParams() != nil {
@@ -99,27 +102,7 @@ func (p ParamsDefinition) ValidateRequired() bool {
 }
 
 func (p ParamsDefinition) FuncName() string {
-	var v string
-	switch p.Action.Routes[0].Verb {
-	case "GET":
-		v = "Get"
-	case "PUT":
-		v = "Put"
-	case "POST":
-		v = "Post"
-	case "DELETE":
-		v = "Delete"
-	case "OPTIONS":
-		v = "Options"
-	case "HEAD":
-		v = "Head"
-	case "PATCH":
-		v = "Patch"
-	default:
-		v = "Get"
-	}
-
-	return p.Name + v
+	return p.Name
 }
 
 func (p ParamsDefinition) FuncArgs(target string) string {
@@ -188,7 +171,7 @@ func convertTypeString(t design.Kind, target string) string {
 type Param struct {
 	original    *design.AttributeDefinition
 	Name        string // CamelCase name
-	Kind        string // kind such as bool, int, ...
+	Kind        string // kind such as bool, number, ...
 	Description string
 }
 

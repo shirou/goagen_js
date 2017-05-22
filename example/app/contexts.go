@@ -15,290 +15,235 @@ import (
 	"github.com/goadesign/goa"
 	"net/http"
 	"strconv"
+	"unicode/utf8"
 )
 
-// GetIntGetContext provides the get get_int action context.
-type GetIntGetContext struct {
+// CreateUserContext provides the user create action context.
+type CreateUserContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Int         *int
-	IntArray    []int
-	IntEnum     *int
-	IntMax      *int
-	IntMin      *int
-	IntMinmax   *int
-	IntRequired int
-	IntSecret   *int
+	Payload *CreateUserPayload
 }
 
-// NewGetIntGetContext parses the incoming request URL and body, performs validations and creates the
-// context used by the get controller get_int action.
-func NewGetIntGetContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetIntGetContext, error) {
+// NewCreateUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller create action.
+func NewCreateUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*CreateUserContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := GetIntGetContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramInt := req.Params["int"]
-	if len(paramInt) > 0 {
-		rawInt := paramInt[0]
-		if int_, err2 := strconv.Atoi(rawInt); err2 == nil {
-			tmp2 := int_
-			tmp1 := &tmp2
-			rctx.Int = tmp1
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("int", rawInt, "integer"))
-		}
-	}
-	paramIntArray := req.Params["int_array"]
-	if len(paramIntArray) > 0 {
-		params := make([]int, len(paramIntArray))
-		for i, rawIntArray := range paramIntArray {
-			if intArray, err2 := strconv.Atoi(rawIntArray); err2 == nil {
-				params[i] = intArray
-			} else {
-				err = goa.MergeErrors(err, goa.InvalidParamTypeError("int_array", rawIntArray, "integer"))
-			}
-		}
-		rctx.IntArray = params
-	}
-	paramIntEnum := req.Params["int_enum"]
-	if len(paramIntEnum) > 0 {
-		rawIntEnum := paramIntEnum[0]
-		if intEnum, err2 := strconv.Atoi(rawIntEnum); err2 == nil {
-			tmp5 := intEnum
-			tmp4 := &tmp5
-			rctx.IntEnum = tmp4
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("int_enum", rawIntEnum, "integer"))
-		}
-		if rctx.IntEnum != nil {
-			if !(*rctx.IntEnum == 1 || *rctx.IntEnum == 2 || *rctx.IntEnum == 3) {
-				err = goa.MergeErrors(err, goa.InvalidEnumValueError(`int_enum`, *rctx.IntEnum, []interface{}{1, 2, 3}))
-			}
-		}
-	}
-	paramIntMax := req.Params["int_max"]
-	if len(paramIntMax) > 0 {
-		rawIntMax := paramIntMax[0]
-		if intMax, err2 := strconv.Atoi(rawIntMax); err2 == nil {
-			tmp7 := intMax
-			tmp6 := &tmp7
-			rctx.IntMax = tmp6
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("int_max", rawIntMax, "integer"))
-		}
-		if rctx.IntMax != nil {
-			if *rctx.IntMax > 10 {
-				err = goa.MergeErrors(err, goa.InvalidRangeError(`int_max`, *rctx.IntMax, 10, false))
-			}
-		}
-	}
-	paramIntMin := req.Params["int_min"]
-	if len(paramIntMin) > 0 {
-		rawIntMin := paramIntMin[0]
-		if intMin, err2 := strconv.Atoi(rawIntMin); err2 == nil {
-			tmp9 := intMin
-			tmp8 := &tmp9
-			rctx.IntMin = tmp8
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("int_min", rawIntMin, "integer"))
-		}
-		if rctx.IntMin != nil {
-			if *rctx.IntMin < -1 {
-				err = goa.MergeErrors(err, goa.InvalidRangeError(`int_min`, *rctx.IntMin, -1, true))
-			}
-		}
-	}
-	paramIntMinmax := req.Params["int_minmax"]
-	if len(paramIntMinmax) > 0 {
-		rawIntMinmax := paramIntMinmax[0]
-		if intMinmax, err2 := strconv.Atoi(rawIntMinmax); err2 == nil {
-			tmp11 := intMinmax
-			tmp10 := &tmp11
-			rctx.IntMinmax = tmp10
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("int_minmax", rawIntMinmax, "integer"))
-		}
-		if rctx.IntMinmax != nil {
-			if *rctx.IntMinmax < 0 {
-				err = goa.MergeErrors(err, goa.InvalidRangeError(`int_minmax`, *rctx.IntMinmax, 0, true))
-			}
-		}
-		if rctx.IntMinmax != nil {
-			if *rctx.IntMinmax > 10 {
-				err = goa.MergeErrors(err, goa.InvalidRangeError(`int_minmax`, *rctx.IntMinmax, 10, false))
-			}
-		}
-	}
-	paramIntRequired := req.Params["int_required"]
-	if len(paramIntRequired) == 0 {
-		err = goa.MergeErrors(err, goa.MissingParamError("int_required"))
-	} else {
-		rawIntRequired := paramIntRequired[0]
-		if intRequired, err2 := strconv.Atoi(rawIntRequired); err2 == nil {
-			rctx.IntRequired = intRequired
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("int_required", rawIntRequired, "integer"))
-		}
-	}
-	paramIntSecret := req.Params["int_secret"]
-	if len(paramIntSecret) > 0 {
-		rawIntSecret := paramIntSecret[0]
-		if intSecret, err2 := strconv.Atoi(rawIntSecret); err2 == nil {
-			tmp14 := intSecret
-			tmp13 := &tmp14
-			rctx.IntSecret = tmp13
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("int_secret", rawIntSecret, "integer"))
-		}
-	}
+	rctx := CreateUserContext{Context: ctx, ResponseData: resp, RequestData: req}
 	return &rctx, err
 }
 
+// createUserPayload is the user create action payload.
+type createUserPayload struct {
+	Age   *int    `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Name  *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Sex   *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
+}
+
+// Validate runs the validation rules defined in the design.
+func (payload *createUserPayload) Validate() (err error) {
+	if payload.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "name"))
+	}
+	if payload.Age != nil {
+		if *payload.Age < 20 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`raw.age`, *payload.Age, 20, true))
+		}
+	}
+	if payload.Age != nil {
+		if *payload.Age > 70 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`raw.age`, *payload.Age, 70, false))
+		}
+	}
+	if payload.Email != nil {
+		if ok := goa.ValidatePattern(`/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/`, *payload.Email); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`raw.email`, *payload.Email, `/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/`))
+		}
+	}
+	if payload.Name != nil {
+		if utf8.RuneCountInString(*payload.Name) < 4 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`raw.name`, *payload.Name, utf8.RuneCountInString(*payload.Name), 4, true))
+		}
+	}
+	if payload.Name != nil {
+		if utf8.RuneCountInString(*payload.Name) > 16 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`raw.name`, *payload.Name, utf8.RuneCountInString(*payload.Name), 16, false))
+		}
+	}
+	if payload.Sex != nil {
+		if !(*payload.Sex == "male" || *payload.Sex == "female" || *payload.Sex == "other") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`raw.sex`, *payload.Sex, []interface{}{"male", "female", "other"}))
+		}
+	}
+	return
+}
+
+// Publicize creates CreateUserPayload from createUserPayload
+func (payload *createUserPayload) Publicize() *CreateUserPayload {
+	var pub CreateUserPayload
+	if payload.Age != nil {
+		pub.Age = payload.Age
+	}
+	if payload.Email != nil {
+		pub.Email = payload.Email
+	}
+	if payload.Name != nil {
+		pub.Name = *payload.Name
+	}
+	if payload.Sex != nil {
+		pub.Sex = payload.Sex
+	}
+	return &pub
+}
+
+// CreateUserPayload is the user create action payload.
+type CreateUserPayload struct {
+	Age   *int    `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Name  string  `form:"name" json:"name" xml:"name"`
+	Sex   *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
+}
+
+// Validate runs the validation rules defined in the design.
+func (payload *CreateUserPayload) Validate() (err error) {
+	if payload.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`raw`, "name"))
+	}
+	if payload.Age != nil {
+		if *payload.Age < 20 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`raw.age`, *payload.Age, 20, true))
+		}
+	}
+	if payload.Age != nil {
+		if *payload.Age > 70 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`raw.age`, *payload.Age, 70, false))
+		}
+	}
+	if payload.Email != nil {
+		if ok := goa.ValidatePattern(`/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/`, *payload.Email); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`raw.email`, *payload.Email, `/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/`))
+		}
+	}
+	if utf8.RuneCountInString(payload.Name) < 4 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`raw.name`, payload.Name, utf8.RuneCountInString(payload.Name), 4, true))
+	}
+	if utf8.RuneCountInString(payload.Name) > 16 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`raw.name`, payload.Name, utf8.RuneCountInString(payload.Name), 16, false))
+	}
+	if payload.Sex != nil {
+		if !(*payload.Sex == "male" || *payload.Sex == "female" || *payload.Sex == "other") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`raw.sex`, *payload.Sex, []interface{}{"male", "female", "other"}))
+		}
+	}
+	return
+}
+
 // OK sends a HTTP response with status code 200.
-func (ctx *GetIntGetContext) OK(resp []byte) error {
+func (ctx *CreateUserContext) OK(resp []byte) error {
 	ctx.ResponseData.Header().Set("Content-Type", "text/plain")
 	ctx.ResponseData.WriteHeader(200)
 	_, err := ctx.ResponseData.Write(resp)
 	return err
 }
 
-// Unauthorized sends a HTTP response with status code 401.
-func (ctx *GetIntGetContext) Unauthorized() error {
-	ctx.ResponseData.WriteHeader(401)
-	return nil
-}
-
 // InternalServerError sends a HTTP response with status code 500.
-func (ctx *GetIntGetContext) InternalServerError() error {
+func (ctx *CreateUserContext) InternalServerError() error {
 	ctx.ResponseData.WriteHeader(500)
 	return nil
 }
 
-// PathParamsGetContext provides the get path_params action context.
-type PathParamsGetContext struct {
+// GetUserContext provides the user get action context.
+type GetUserContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	ParamInt int
-	ParamStr string
-	Payload  *PathParamsGetPayload
+	UserID int
 }
 
-// NewPathParamsGetContext parses the incoming request URL and body, performs validations and creates the
-// context used by the get controller path_params action.
-func NewPathParamsGetContext(ctx context.Context, r *http.Request, service *goa.Service) (*PathParamsGetContext, error) {
+// NewGetUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller get action.
+func NewGetUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*GetUserContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := PathParamsGetContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramParamInt := req.Params["ParamInt"]
-	if len(paramParamInt) > 0 {
-		rawParamInt := paramParamInt[0]
-		if paramInt, err2 := strconv.Atoi(rawParamInt); err2 == nil {
-			rctx.ParamInt = paramInt
+	rctx := GetUserContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramUserID := req.Params["UserID"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		if userID, err2 := strconv.Atoi(rawUserID); err2 == nil {
+			rctx.UserID = userID
 		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("ParamInt", rawParamInt, "integer"))
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("UserID", rawUserID, "integer"))
 		}
-		if rctx.ParamInt > 10 {
-			err = goa.MergeErrors(err, goa.InvalidRangeError(`ParamInt`, rctx.ParamInt, 10, false))
+		if rctx.UserID > 10000 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`UserID`, rctx.UserID, 10000, false))
 		}
-	}
-	paramParamStr := req.Params["ParamStr"]
-	if len(paramParamStr) > 0 {
-		rawParamStr := paramParamStr[0]
-		rctx.ParamStr = rawParamStr
 	}
 	return &rctx, err
 }
 
-// pathParamsGetPayload is the get path_params action payload.
-type pathParamsGetPayload struct {
-	ParamStr *string `form:"ParamStr,omitempty" json:"ParamStr,omitempty" xml:"ParamStr,omitempty"`
-}
-
-// Publicize creates PathParamsGetPayload from pathParamsGetPayload
-func (payload *pathParamsGetPayload) Publicize() *PathParamsGetPayload {
-	var pub PathParamsGetPayload
-	if payload.ParamStr != nil {
-		pub.ParamStr = payload.ParamStr
-	}
-	return &pub
-}
-
-// PathParamsGetPayload is the get path_params action payload.
-type PathParamsGetPayload struct {
-	ParamStr *string `form:"ParamStr,omitempty" json:"ParamStr,omitempty" xml:"ParamStr,omitempty"`
-}
-
 // OK sends a HTTP response with status code 200.
-func (ctx *PathParamsGetContext) OK(r *Inttest) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.inttest+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// OKSecret sends a HTTP response with status code 200.
-func (ctx *PathParamsGetContext) OKSecret(r *InttestSecret) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.inttest+json")
+func (ctx *GetUserContext) OK(r *User) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.user+json")
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
 // Unauthorized sends a HTTP response with status code 401.
-func (ctx *PathParamsGetContext) Unauthorized() error {
+func (ctx *GetUserContext) Unauthorized() error {
 	ctx.ResponseData.WriteHeader(401)
 	return nil
 }
 
 // InternalServerError sends a HTTP response with status code 500.
-func (ctx *PathParamsGetContext) InternalServerError() error {
+func (ctx *GetUserContext) InternalServerError() error {
 	ctx.ResponseData.WriteHeader(500)
 	return nil
 }
 
-// WithoutGetContext provides the get without action context.
-type WithoutGetContext struct {
+// ListUserContext provides the user list action context.
+type ListUserContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
 }
 
-// NewWithoutGetContext parses the incoming request URL and body, performs validations and creates the
-// context used by the get controller without action.
-func NewWithoutGetContext(ctx context.Context, r *http.Request, service *goa.Service) (*WithoutGetContext, error) {
+// NewListUserContext parses the incoming request URL and body, performs validations and creates the
+// context used by the user controller list action.
+func NewListUserContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListUserContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := WithoutGetContext{Context: ctx, ResponseData: resp, RequestData: req}
+	rctx := ListUserContext{Context: ctx, ResponseData: resp, RequestData: req}
 	return &rctx, err
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *WithoutGetContext) OK(r *Inttest) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.inttest+json")
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// OKSecret sends a HTTP response with status code 200.
-func (ctx *WithoutGetContext) OKSecret(r *InttestSecret) error {
-	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.inttest+json")
+func (ctx *ListUserContext) OK(r UserCollection) error {
+	ctx.ResponseData.Header().Set("Content-Type", "application/vnd.user+json; type=collection")
+	if r == nil {
+		r = UserCollection{}
+	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
 // Unauthorized sends a HTTP response with status code 401.
-func (ctx *WithoutGetContext) Unauthorized() error {
+func (ctx *ListUserContext) Unauthorized() error {
 	ctx.ResponseData.WriteHeader(401)
 	return nil
 }
 
 // InternalServerError sends a HTTP response with status code 500.
-func (ctx *WithoutGetContext) InternalServerError() error {
+func (ctx *ListUserContext) InternalServerError() error {
 	ctx.ResponseData.WriteHeader(500)
 	return nil
 }

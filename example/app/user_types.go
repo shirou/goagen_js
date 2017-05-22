@@ -10,21 +10,113 @@
 
 package app
 
-// getParamPayload user type.
-type getParamPayload struct {
-	ParamStr *string `form:"ParamStr,omitempty" json:"ParamStr,omitempty" xml:"ParamStr,omitempty"`
+import (
+	"github.com/goadesign/goa"
+	"unicode/utf8"
+)
+
+// userCreatePayload user type.
+type userCreatePayload struct {
+	Age   *int    `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Name  *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	Sex   *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
 }
 
-// Publicize creates GetParamPayload from getParamPayload
-func (ut *getParamPayload) Publicize() *GetParamPayload {
-	var pub GetParamPayload
-	if ut.ParamStr != nil {
-		pub.ParamStr = ut.ParamStr
+// Validate validates the userCreatePayload type instance.
+func (ut *userCreatePayload) Validate() (err error) {
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if ut.Age != nil {
+		if *ut.Age < 20 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`response.age`, *ut.Age, 20, true))
+		}
+	}
+	if ut.Age != nil {
+		if *ut.Age > 70 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`response.age`, *ut.Age, 70, false))
+		}
+	}
+	if ut.Email != nil {
+		if ok := goa.ValidatePattern(`/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/`, *ut.Email); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.email`, *ut.Email, `/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/`))
+		}
+	}
+	if ut.Name != nil {
+		if utf8.RuneCountInString(*ut.Name) < 4 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 4, true))
+		}
+	}
+	if ut.Name != nil {
+		if utf8.RuneCountInString(*ut.Name) > 16 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 16, false))
+		}
+	}
+	if ut.Sex != nil {
+		if !(*ut.Sex == "male" || *ut.Sex == "female" || *ut.Sex == "other") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.sex`, *ut.Sex, []interface{}{"male", "female", "other"}))
+		}
+	}
+	return
+}
+
+// Publicize creates UserCreatePayload from userCreatePayload
+func (ut *userCreatePayload) Publicize() *UserCreatePayload {
+	var pub UserCreatePayload
+	if ut.Age != nil {
+		pub.Age = ut.Age
+	}
+	if ut.Email != nil {
+		pub.Email = ut.Email
+	}
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
+	if ut.Sex != nil {
+		pub.Sex = ut.Sex
 	}
 	return &pub
 }
 
-// GetParamPayload user type.
-type GetParamPayload struct {
-	ParamStr *string `form:"ParamStr,omitempty" json:"ParamStr,omitempty" xml:"ParamStr,omitempty"`
+// UserCreatePayload user type.
+type UserCreatePayload struct {
+	Age   *int    `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Name  string  `form:"name" json:"name" xml:"name"`
+	Sex   *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
+}
+
+// Validate validates the UserCreatePayload type instance.
+func (ut *UserCreatePayload) Validate() (err error) {
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if ut.Age != nil {
+		if *ut.Age < 20 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`response.age`, *ut.Age, 20, true))
+		}
+	}
+	if ut.Age != nil {
+		if *ut.Age > 70 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`response.age`, *ut.Age, 70, false))
+		}
+	}
+	if ut.Email != nil {
+		if ok := goa.ValidatePattern(`/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/`, *ut.Email); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.email`, *ut.Email, `/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/`))
+		}
+	}
+	if utf8.RuneCountInString(ut.Name) < 4 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, ut.Name, utf8.RuneCountInString(ut.Name), 4, true))
+	}
+	if utf8.RuneCountInString(ut.Name) > 16 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, ut.Name, utf8.RuneCountInString(ut.Name), 16, false))
+	}
+	if ut.Sex != nil {
+		if !(*ut.Sex == "male" || *ut.Sex == "female" || *ut.Sex == "other") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.sex`, *ut.Sex, []interface{}{"male", "female", "other"}))
+		}
+	}
+	return
 }

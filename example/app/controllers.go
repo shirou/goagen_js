@@ -87,21 +87,20 @@ func handleFilesOrigin(h goa.Handler) goa.Handler {
 	}
 }
 
-// GetController is the controller interface for the Get actions.
-type GetController interface {
+// UserController is the controller interface for the User actions.
+type UserController interface {
 	goa.Muxer
-	GetInt(*GetIntGetContext) error
-	PathParams(*PathParamsGetContext) error
-	Without(*WithoutGetContext) error
+	Create(*CreateUserContext) error
+	Get(*GetUserContext) error
+	List(*ListUserContext) error
 }
 
-// MountGetController "mounts" a Get resource controller on the given service.
-func MountGetController(service *goa.Service, ctrl GetController) {
+// MountUserController "mounts" a User resource controller on the given service.
+func MountUserController(service *goa.Service, ctrl UserController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/get/int", ctrl.MuxHandler("preflight", handleGetOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/get/int/:ParamInt/:ParamStr", ctrl.MuxHandler("preflight", handleGetOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/get", ctrl.MuxHandler("preflight", handleGetOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/user", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/user/:UserID", ctrl.MuxHandler("preflight", handleUserOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -109,37 +108,21 @@ func MountGetController(service *goa.Service, ctrl GetController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewGetIntGetContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		return ctrl.GetInt(rctx)
-	}
-	h = handleGetOrigin(h)
-	service.Mux.Handle("GET", "/get/int", ctrl.MuxHandler("get_int", h, nil))
-	service.LogInfo("mount", "ctrl", "Get", "action", "GetInt", "route", "GET /get/int")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewPathParamsGetContext(ctx, req, service)
+		rctx, err := NewCreateUserContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
 		// Build the payload
 		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*PathParamsGetPayload)
+			rctx.Payload = rawPayload.(*CreateUserPayload)
 		} else {
 			return goa.MissingPayloadError()
 		}
-		return ctrl.PathParams(rctx)
+		return ctrl.Create(rctx)
 	}
-	h = handleGetOrigin(h)
-	service.Mux.Handle("GET", "/get/int/:ParamInt/:ParamStr", ctrl.MuxHandler("path_params", h, unmarshalPathParamsGetPayload))
-	service.LogInfo("mount", "ctrl", "Get", "action", "PathParams", "route", "GET /get/int/:ParamInt/:ParamStr")
+	h = handleUserOrigin(h)
+	service.Mux.Handle("POST", "/user", ctrl.MuxHandler("create", h, unmarshalCreateUserPayload))
+	service.LogInfo("mount", "ctrl", "User", "action", "Create", "route", "POST /user")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -147,19 +130,35 @@ func MountGetController(service *goa.Service, ctrl GetController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewWithoutGetContext(ctx, req, service)
+		rctx, err := NewGetUserContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
-		return ctrl.Without(rctx)
+		return ctrl.Get(rctx)
 	}
-	h = handleGetOrigin(h)
-	service.Mux.Handle("GET", "/get", ctrl.MuxHandler("without", h, nil))
-	service.LogInfo("mount", "ctrl", "Get", "action", "Without", "route", "GET /get")
+	h = handleUserOrigin(h)
+	service.Mux.Handle("GET", "/user/:UserID", ctrl.MuxHandler("get", h, nil))
+	service.LogInfo("mount", "ctrl", "User", "action", "Get", "route", "GET /user/:UserID")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewListUserContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.List(rctx)
+	}
+	h = handleUserOrigin(h)
+	service.Mux.Handle("GET", "/user", ctrl.MuxHandler("list", h, nil))
+	service.LogInfo("mount", "ctrl", "User", "action", "List", "route", "GET /user")
 }
 
-// handleGetOrigin applies the CORS response headers corresponding to the origin.
-func handleGetOrigin(h goa.Handler) goa.Handler {
+// handleUserOrigin applies the CORS response headers corresponding to the origin.
+func handleUserOrigin(h goa.Handler) goa.Handler {
 
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		origin := req.Header.Get("Origin")
@@ -184,10 +183,15 @@ func handleGetOrigin(h goa.Handler) goa.Handler {
 	}
 }
 
-// unmarshalPathParamsGetPayload unmarshals the request body into the context request data Payload field.
-func unmarshalPathParamsGetPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &pathParamsGetPayload{}
+// unmarshalCreateUserPayload unmarshals the request body into the context request data Payload field.
+func unmarshalCreateUserPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &createUserPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
 		return err
 	}
 	goa.ContextRequest(ctx).Payload = payload.Publicize()

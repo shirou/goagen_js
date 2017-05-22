@@ -74,7 +74,6 @@ func parseConstraint(kind string, o *dslengine.ValidationDefinition, required bo
 	if o.MaxLength != nil {
 		ret.MaxLength = o.MaxLength
 	}
-	//	v.AddRequired(o.Required)
 
 	return ret
 }

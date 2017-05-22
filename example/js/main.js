@@ -1,22 +1,34 @@
-import * as api from "./api_request.js";
-import * as v from "./api_validator.js";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {Provider} from 'react-redux';
+import {createStore, combineReducers} from 'redux';
+import {reducer as reduxFormReducer} from 'redux-form';
+import { Values } from 'redux-form-website-template';
 
-const payload = {
-//  int_required: 10,
-  int_enum: 10,
-  int_max: 1,
-};
-
-//console.log(v.validate(v.GetIntGet.payload, payload));
-
-console.log(v.validate(v.PathParamsGet.ParamInt, 10000));
-/*
-
-api.GetIntGet(payload).then((response) => {
-  if (response.status !== 200){
-    console.log("error", response.status);
-    throw response.json();
-  }
-  return {};
+const dest = document.getElementById('content');
+const reducer = combineReducers({
+  form: reduxFormReducer // mounted under "form"
 });
-*/
+const store = (createStore)(reducer);
+
+const showResults = values =>
+  new Promise(resolve => {
+    setTimeout(() => {
+      // simulate server latency
+      window.alert(`You submitted:\n\n${JSON.stringify(values, null, 2)}`)
+      resolve()
+    }, 500)
+  });
+
+const FieldLevelValidationForm = require('./components/FieldLevelValidationForm').default;
+
+ReactDOM.render(
+  <Provider store={store}>
+    <div>
+      <h2>Form</h2>
+      <FieldLevelValidationForm onSubmit={showResults} />
+      <Values form="fieldLevelValidation" />
+    </div>
+  </Provider>,
+  dest
+);

@@ -12,57 +12,60 @@ package app
 
 import (
 	"github.com/goadesign/goa"
+	"unicode/utf8"
 )
 
-// Validate test (default view)
+// User media type (default view)
 //
-// Identifier: application/vnd.inttest+json; view=default
-type Inttest struct {
-	Int      *int  `form:"int,omitempty" json:"int,omitempty" xml:"int,omitempty"`
-	IntArray []int `form:"int_array,omitempty" json:"int_array,omitempty" xml:"int_array,omitempty"`
-	IntEnum  *int  `form:"int_enum,omitempty" json:"int_enum,omitempty" xml:"int_enum,omitempty"`
-	// max
-	IntMax      *int `form:"int_max,omitempty" json:"int_max,omitempty" xml:"int_max,omitempty"`
-	IntMin      *int `form:"int_min,omitempty" json:"int_min,omitempty" xml:"int_min,omitempty"`
-	IntMinmax   *int `form:"int_minmax,omitempty" json:"int_minmax,omitempty" xml:"int_minmax,omitempty"`
-	IntRequired int  `form:"int_required" json:"int_required" xml:"int_required"`
+// Identifier: application/vnd.user+json; view=default
+type User struct {
+	Age  *int    `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
+	Name string  `form:"name" json:"name" xml:"name"`
+	Sex  *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
 }
 
-// Validate validates the Inttest media type instance.
-func (mt *Inttest) Validate() (err error) {
-	if mt.IntEnum != nil {
-		if !(*mt.IntEnum == 1 || *mt.IntEnum == 2 || *mt.IntEnum == 3) {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.int_enum`, *mt.IntEnum, []interface{}{1, 2, 3}))
+// Validate validates the User media type instance.
+func (mt *User) Validate() (err error) {
+	if mt.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Age != nil {
+		if *mt.Age < 20 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`response.age`, *mt.Age, 20, true))
 		}
 	}
-	if mt.IntMax != nil {
-		if *mt.IntMax > 10 {
-			err = goa.MergeErrors(err, goa.InvalidRangeError(`response.int_max`, *mt.IntMax, 10, false))
+	if mt.Age != nil {
+		if *mt.Age > 70 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`response.age`, *mt.Age, 70, false))
 		}
 	}
-	if mt.IntMin != nil {
-		if *mt.IntMin < -1 {
-			err = goa.MergeErrors(err, goa.InvalidRangeError(`response.int_min`, *mt.IntMin, -1, true))
-		}
+	if utf8.RuneCountInString(mt.Name) < 4 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, mt.Name, utf8.RuneCountInString(mt.Name), 4, true))
 	}
-	if mt.IntMinmax != nil {
-		if *mt.IntMinmax < 0 {
-			err = goa.MergeErrors(err, goa.InvalidRangeError(`response.int_minmax`, *mt.IntMinmax, 0, true))
-		}
+	if utf8.RuneCountInString(mt.Name) > 16 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, mt.Name, utf8.RuneCountInString(mt.Name), 16, false))
 	}
-	if mt.IntMinmax != nil {
-		if *mt.IntMinmax > 10 {
-			err = goa.MergeErrors(err, goa.InvalidRangeError(`response.int_minmax`, *mt.IntMinmax, 10, false))
+	if mt.Sex != nil {
+		if !(*mt.Sex == "male" || *mt.Sex == "female" || *mt.Sex == "other") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.sex`, *mt.Sex, []interface{}{"male", "female", "other"}))
 		}
 	}
 	return
 }
 
-// Validate test (secret view)
+// UserCollection is the media type for an array of User (default view)
 //
-// Identifier: application/vnd.inttest+json; view=secret
-type InttestSecret struct {
-	Int *int `form:"int,omitempty" json:"int,omitempty" xml:"int,omitempty"`
-	// not included in default
-	IntSecret *int `form:"int_secret,omitempty" json:"int_secret,omitempty" xml:"int_secret,omitempty"`
+// Identifier: application/vnd.user+json; type=collection; view=default
+type UserCollection []*User
+
+// Validate validates the UserCollection media type instance.
+func (mt UserCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
 }

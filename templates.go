@@ -20,7 +20,10 @@ const validatorModuleT = `export function validate(rule, actual) {
 
   if (typeof actual === "object") {
     Object.keys(actual).map(function(key, index) {
-      errors[key] = validate(rule[key], actual[key]);
+      const ret = validate(rule[key], actual[key]);
+      if (ret !== null) {
+        errors[key] = ret;
+      }
     });
   } else {
     if (rule.kind !== typeof actual){
@@ -55,8 +58,7 @@ const validatorModuleT = `export function validate(rule, actual) {
       }
     }
   }
-
-  if (errors.length === 0) {
+  if (Object.keys(errors).length === 0) {
     return null;
   }
   return errors;
@@ -72,20 +74,15 @@ export function {{ $funcName }}({{ .Args }}) {
   let errors = {};
   let ret;
 {{- range $p := .PathParams }}
-  ret = v.validate(v.{{ $funcName }}.{{ $p.Name }}, {{ $p.Name }});
-  if (ret !== null) {
-     errors.{{ $p.Name }} = ret;
+  if (v.validate(v.{{ $funcName }}.{{ $p.Name }}, {{ $p.Name }}) !== null) {
+    return Promise.reject(new Error("validation error"));
   }
 {{- end }}
 {{- if .QueryParams }}
-  ret = v.validate(v.{{ $funcName }}.payload, payload);
-  if (ret !== null) {
-     errors.payload = ret;
+  if (v.validate(v.{{ $funcName }}.payload, payload) !== null) {
+    return Promise.reject(new Error("validation error"));
   }
 {{- end }}
-  if (errors.length > 0) {
-    return Promise.reject({status: 400, detail: "validatoin error", meta: errors});
-  }
 {{- end }}
   return {{ .Request }};
 }

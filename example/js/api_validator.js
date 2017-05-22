@@ -8,61 +8,25 @@ export const InvalidRangeError = "range exceeded";
 export const InvalidLengthError = "length is exceeded or less";
 export const InvalidKindError = "invalid kind";
 
-export const GetIntGet = {
-   "payload": {
-     "int": {
-       "kind": "number"
-     },
-     "int_array": {
-       "kind": "array"
-     },
-     "int_enum": {
-       "kind": "number",
-       "enum": [
-         1,
-         2,
-         3
-       ]
-     },
-     "int_max": {
-       "kind": "number",
-       "maximum": 10
-     },
-     "int_min": {
-       "kind": "number",
-       "minimum": -1
-     },
-     "int_minmax": {
-       "kind": "number",
-       "minimum": 0,
-       "maximum": 10
-     },
-     "int_required": {
-       "kind": "number"
-     },
-     "int_secret": {
-       "kind": "number"
-     }
-   }
- };
+export const UserCreate = {};
 
-export const PathParamsGet = {
-   "ParamInt": {
+export const UserGet = {
+   "UserID": {
      "kind": "number",
-     "maximum": 10
-   },
-   "ParamStr": {
-     "kind": "string"
+     "maximum": 10000
    }
  };
 
-export const WithoutGet = {};
+export const UserList = {};
 export function validate(rule, actual) {
   let errors = {};
 
   if (typeof actual === "object") {
     Object.keys(actual).map(function(key, index) {
-      errors[key] = validate(rule[key], actual[key]);
+      const ret = validate(rule[key], actual[key]);
+      if (ret !== null) {
+        errors[key] = ret;
+      }
     });
   } else {
     if (rule.kind !== typeof actual){
@@ -97,8 +61,7 @@ export function validate(rule, actual) {
       }
     }
   }
-
-  if (errors.length === 0) {
+  if (Object.keys(errors).length === 0) {
     return null;
   }
   return errors;

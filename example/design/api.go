@@ -24,5 +24,5 @@ var _ = API("goagen_js", func() {
 		Credentials()
 	})
 
-	define_int_trait()
+	defineUserTrait()
 })

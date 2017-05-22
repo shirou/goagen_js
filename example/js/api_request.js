@@ -8,51 +8,30 @@ const scheme = 'http';
 const host = 'localhost:8080';
 const urlPrefix = scheme + '://' + host;
 
-// GetInt
-// Get Method
+// UserCreate
 // 
-export function GetIntGet(payload) {
-  const url = urlPrefix + "/get/int";
-  let errors = {};
-  let ret;
-  ret = v.validate(v.GetIntGet.payload, payload);
-  if (ret !== null) {
-     errors.payload = ret;
-  }
-  if (errors.length > 0) {
-    return Promise.reject({status: 400, detail: "validatoin error", meta: errors});
-  }
-  return get(url, payload);
+export function UserCreate() {
+  const url = urlPrefix + "/user";
+  return post(url);
 }
 
-// PathParams
-// Get Method with params in path
+// UserGet
 // 
-// paramInt(number): path_params param int
-// paramStr(string): path_params param str. This is same name in the payload.
-export function PathParamsGet(paramInt, paramStr) {
-  const url = urlPrefix + "/get/int/${paramInt}/${paramStr}";
+// userID(number): 
+export function UserGet(userID) {
+  const url = urlPrefix + "/user/${userID}";
   let errors = {};
   let ret;
-  ret = v.validate(v.PathParamsGet.paramInt, paramInt);
-  if (ret !== null) {
-     errors.paramInt = ret;
-  }
-  ret = v.validate(v.PathParamsGet.paramStr, paramStr);
-  if (ret !== null) {
-     errors.paramStr = ret;
-  }
-  if (errors.length > 0) {
-    return Promise.reject({status: 400, detail: "validatoin error", meta: errors});
+  if (v.validate(v.UserGet.userID, userID) !== null) {
+    return Promise.reject(new Error("validation error"));
   }
   return get(url);
 }
 
-// Without
-// Get Method without params
+// UserList
 // 
-export function WithoutGet() {
-  const url = urlPrefix + "/get";
+export function UserList() {
+  const url = urlPrefix + "/user";
   return get(url);
 }
 

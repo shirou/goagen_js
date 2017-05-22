@@ -2,19 +2,26 @@ var path = require('path');
 var webpack = require('webpack');
 
 module.exports = {
-  entry: './js/main.js',
+  entry: [
+    'babel-polyfill',
+    './js/main.js'
+  ],
   output: {
     path: path.resolve(__dirname, './assets'),
     publicPath: '/assets/',
     filename: 'js/app.js'
   },
+  resolve: {
+    modules: [ 'js', 'node_modules' ],
+    extensions: [ '.json', '.js' ]
+  },
   module: {
-    rules: [
+    loaders: [
       {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/
-      }
+        test: /\.jsx?/,
+        loaders: [ 'babel-loader', 'eslint-loader' ],
+        include: path.join(__dirname, 'js')
+      },
     ]
   },
   devServer: {
