@@ -2,6 +2,7 @@ package goagen_js
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/goadesign/goa/dslengine"
 )
@@ -57,10 +58,12 @@ func parseConstraint(kind string, o *dslengine.ValidationDefinition, required bo
 		ret.Enum = o.Values
 	}
 	if o.Format != "" {
-		ret.Format = o.Format
+		// unescape
+		ret.Format = strings.Replace(o.Format, `\`, "", -1)
 	}
 	if o.Pattern != "" {
-		ret.Pattern = o.Pattern
+		// unescape
+		ret.Pattern = strings.Replace(o.Pattern, `\`, "", -1)
 	}
 	if o.Minimum != nil {
 		ret.Minimum = o.Minimum

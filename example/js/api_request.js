@@ -9,29 +9,34 @@ const host = 'localhost:8080';
 const urlPrefix = scheme + '://' + host;
 
 // UserCreate
-// 
-export function UserCreate() {
-  const url = urlPrefix + "/user";
-  return post(url);
+// payload(object): payload
+export function UserCreate(payload) {
+  const url = urlPrefix + `/user`;
+  let e = undefined;
+  e = v.validate(v.UserCreate.payload, payload);
+  if (e) {
+    return Promise.reject(e);
+  }
+  return post(url, payload);
 }
 
 // UserGet
-// 
 // userID(number): 
+// payload(object): payload
 export function UserGet(userID) {
-  const url = urlPrefix + "/user/${userID}";
-  let errors = {};
-  let ret;
-  if (v.validate(v.UserGet.userID, userID) !== null) {
-    return Promise.reject(new Error("validation error"));
+  const url = urlPrefix + `/user/${userID}`;
+  let e = undefined;
+  e = v.validate(v.UserGet.userID, userID);
+  if (e) {
+    return Promise.reject(e);
   }
   return get(url);
 }
 
 // UserList
-// 
+// payload(object): payload
 export function UserList() {
-  const url = urlPrefix + "/user";
+  const url = urlPrefix + `/user`;
   return get(url);
 }
 

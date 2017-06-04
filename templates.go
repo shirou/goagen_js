@@ -7,7 +7,8 @@ export const InvalidEnumValueError = "invalid enum value";
 export const InvalidFormatError = "invalid format";
 export const InvalidPatternError = "invalid pattern";
 export const InvalidRangeError = "range exceeded";
-export const InvalidLengthError = "length is exceeded or less";
+export const InvalidMinLengthError = "length is less"
+export const InvalidMaxLengthError = "length is exceeded";
 export const InvalidKindError = "invalid kind";
 `
 
@@ -17,11 +18,10 @@ export const {{ .Name }} = {{ .Constraint }};
 
 const validatorModuleT = `export function validate(rule, actual) {
   let errors = {};
-
   if (typeof actual === "object") {
-    Object.keys(actual).map(function(key, index) {
+    Object.keys(actual).forEach(function(key, index) {
       const ret = validate(rule[key], actual[key]);
-      if (ret !== null) {
+      if (ret !== undefined) {
         errors[key] = ret;
       }
     });
@@ -34,18 +34,18 @@ const validatorModuleT = `export function validate(rule, actual) {
       errors.maximum = InvalidRangeError;
     }
     if (rule.minimum && actual < rule.minimum) {
-      errors.maximum = InvalidRangeError;
+      errors.minimum = InvalidRangeError;
     }
-    if (rule.max_length && actual.length < rule.max_length) {
-      errors.max_length = InvalidLengthError;
+    if (rule.max_length && actual.length > rule.max_length) {
+      errors.max_length = InvalidMaxLengthError;
     }
     if (rule.min_length && actual.length < rule.min_length) {
-      errors.min_length = InvalidLengthError;
+      errors.min_length = InvalidMinLengthError;
     }
-    if (rule.format && new RegExp(rule.format).test(actual)) {
+    if (rule.format && !(new RegExp(rule.format).test(actual))) {
       errors.format = InvalidFormatError;
     }
-    if (rule.pattern && new RegExp(rule.pattern).test(actual)) {
+    if (rule.pattern && !(new RegExp(rule.pattern).test(actual))) {
       errors.pattern = InvalidPatternError;
     }
     if (rule.enum) {
@@ -58,10 +58,10 @@ const validatorModuleT = `export function validate(rule, actual) {
       }
     }
   }
-  if (Object.keys(errors).length === 0) {
-    return null;
+  if (Object.keys(errors).length > 0){
+    return errors;
   }
-  return errors;
+  return undefined;
 }
 `
 
@@ -71,16 +71,17 @@ export function {{ $funcName }}({{ .Args }}) {
   const url = urlPrefix + {{ .UrlArgs }};
 
 {{- if eq .ValidateRequired true }}
-  let errors = {};
-  let ret;
+  let e = undefined;
 {{- range $p := .PathParams }}
-  if (v.validate(v.{{ $funcName }}.{{ $p.Name }}, {{ $p.Name }}) !== null) {
-    return Promise.reject(new Error("validation error"));
+  e = v.validate(v.{{ $funcName }}.{{ $p.Name }}, {{ $p.Name }});
+  if (e) {
+    return Promise.reject(e);
   }
 {{- end }}
 {{- if .QueryParams }}
-  if (v.validate(v.{{ $funcName }}.payload, payload) !== null) {
-    return Promise.reject(new Error("validation error"));
+  e = v.validate(v.{{ $funcName }}.payload, payload);
+  if (e) {
+    return Promise.reject(e);
   }
 {{- end }}
 {{- end }}

@@ -74,6 +74,20 @@ func parseAction(action *design.ActionDefinition, target string) (ParamsDefiniti
 		}
 	}
 
+	// Payload and Query are stored same Query field.
+	if action.Payload != nil {
+		m := action.Payload.Type.ToObject()
+		pv := make(map[string]Constraint)
+		for a, att := range m {
+			kind := convertTypeString(att.Type.Kind(), target)
+			ret.Query = append(ret.Query, newParam(action, target, a, att))
+			pv[a] = parseConstraint(kind, att.Validation, att.IsRequired(a))
+		}
+		if len(pv) > 0 {
+			ret.Validator.constraint["payload"] = pv
+		}
+	}
+
 	return ret, nil
 }
 
@@ -84,9 +98,11 @@ func (p ParamsDefinition) Comments(action *design.ActionDefinition) []string {
 	if p.Action.Description != "" {
 		c = append(c, p.Action.Description)
 	}
-	c = append(c, "")
 	for _, path := range p.Path {
 		c = append(c, fmt.Sprintf("%s(%s): %s", path.Name, path.Kind, path.Description))
+	}
+	if p.Query != nil {
+		c = append(c, fmt.Sprintf("payload(object): payload"))
 	}
 
 	// TODO: why strings.Join(c, "\n"+`// `) expaneded to "../../../" ?
@@ -124,7 +140,7 @@ func (p ParamsDefinition) UrlArgs() string {
 		path = strings.Replace(path, ":"+o, d, 1)
 	}
 
-	return `"` + path + `"`
+	return "`" + path + "`"
 }
 
 func (p ParamsDefinition) Request() string {

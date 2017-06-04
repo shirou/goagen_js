@@ -19,9 +19,10 @@ import (
 //
 // Identifier: application/vnd.user+json; view=default
 type User struct {
-	Age  *int    `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
-	Name string  `form:"name" json:"name" xml:"name"`
-	Sex  *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
+	Age   *int    `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Name  string  `form:"name" json:"name" xml:"name"`
+	Sex   *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
 }
 
 // Validate validates the User media type instance.
@@ -37,6 +38,11 @@ func (mt *User) Validate() (err error) {
 	if mt.Age != nil {
 		if *mt.Age > 70 {
 			err = goa.MergeErrors(err, goa.InvalidRangeError(`response.age`, *mt.Age, 70, false))
+		}
+	}
+	if mt.Email != nil {
+		if ok := goa.ValidatePattern(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`, *mt.Email); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.email`, *mt.Email, `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`))
 		}
 	}
 	if utf8.RuneCountInString(mt.Name) < 4 {

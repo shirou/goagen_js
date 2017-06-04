@@ -39,8 +39,8 @@ func (ut *userCreatePayload) Validate() (err error) {
 		}
 	}
 	if ut.Email != nil {
-		if ok := goa.ValidatePattern(`/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/`, *ut.Email); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.email`, *ut.Email, `/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/`))
+		if ok := goa.ValidatePattern(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`, *ut.Email); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.email`, *ut.Email, `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`))
 		}
 	}
 	if ut.Name != nil {
@@ -103,8 +103,8 @@ func (ut *UserCreatePayload) Validate() (err error) {
 		}
 	}
 	if ut.Email != nil {
-		if ok := goa.ValidatePattern(`/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/`, *ut.Email); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.email`, *ut.Email, `/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/`))
+		if ok := goa.ValidatePattern(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`, *ut.Email); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`response.email`, *ut.Email, `^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`))
 		}
 	}
 	if utf8.RuneCountInString(ut.Name) < 4 {

@@ -5,10 +5,36 @@ export const InvalidEnumValueError = "invalid enum value";
 export const InvalidFormatError = "invalid format";
 export const InvalidPatternError = "invalid pattern";
 export const InvalidRangeError = "range exceeded";
-export const InvalidLengthError = "length is exceeded or less";
+export const InvalidMinLengthError = "length is less"
+export const InvalidMaxLengthError = "length is exceeded";
 export const InvalidKindError = "invalid kind";
 
-export const UserCreate = {};
+export const UserCreate = {
+   "payload": {
+     "age": {
+       "kind": "number",
+       "minimum": 20,
+       "maximum": 70
+     },
+     "email": {
+       "kind": "string",
+       "pattern": "^[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,4}$"
+     },
+     "name": {
+       "kind": "string",
+       "min_length": 4,
+       "max_length": 16
+     },
+     "sex": {
+       "kind": "string",
+       "enum": [
+         "male",
+         "female",
+         "other"
+       ]
+     }
+   }
+ };
 
 export const UserGet = {
    "UserID": {
@@ -20,11 +46,10 @@ export const UserGet = {
 export const UserList = {};
 export function validate(rule, actual) {
   let errors = {};
-
   if (typeof actual === "object") {
-    Object.keys(actual).map(function(key, index) {
+    Object.keys(actual).forEach(function(key, index) {
       const ret = validate(rule[key], actual[key]);
-      if (ret !== null) {
+      if (ret !== undefined) {
         errors[key] = ret;
       }
     });
@@ -37,18 +62,18 @@ export function validate(rule, actual) {
       errors.maximum = InvalidRangeError;
     }
     if (rule.minimum && actual < rule.minimum) {
-      errors.maximum = InvalidRangeError;
+      errors.minimum = InvalidRangeError;
     }
-    if (rule.max_length && actual.length < rule.max_length) {
-      errors.max_length = InvalidLengthError;
+    if (rule.max_length && actual.length > rule.max_length) {
+      errors.max_length = InvalidMaxLengthError;
     }
     if (rule.min_length && actual.length < rule.min_length) {
-      errors.min_length = InvalidLengthError;
+      errors.min_length = InvalidMinLengthError;
     }
-    if (rule.format && new RegExp(rule.format).test(actual)) {
+    if (rule.format && !(new RegExp(rule.format).test(actual))) {
       errors.format = InvalidFormatError;
     }
-    if (rule.pattern && new RegExp(rule.pattern).test(actual)) {
+    if (rule.pattern && !(new RegExp(rule.pattern).test(actual))) {
       errors.pattern = InvalidPatternError;
     }
     if (rule.enum) {
@@ -61,8 +86,8 @@ export function validate(rule, actual) {
       }
     }
   }
-  if (Object.keys(errors).length === 0) {
-    return null;
+  if (Object.keys(errors).length > 0){
+    return errors;
   }
-  return errors;
+  return undefined;
 }

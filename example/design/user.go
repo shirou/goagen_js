@@ -16,7 +16,7 @@ func defineUserTrait() {
 			Maximum(70)
 		})
 		Attribute("email", String, func() {
-			Pattern(`/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/`)
+			Pattern(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 		})
 		Attribute("sex", String, func() {
 			Enum("male", "female", "other")

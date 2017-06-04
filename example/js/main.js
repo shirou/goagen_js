@@ -1,4 +1,5 @@
 import React from 'react';
+import * as api from "./api_request.js";
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 import {createStore, combineReducers} from 'redux';
@@ -11,14 +12,17 @@ const reducer = combineReducers({
 });
 const store = (createStore)(reducer);
 
-const showResults = values =>
-  new Promise(resolve => {
-    setTimeout(() => {
-      // simulate server latency
-      window.alert(`You submitted:\n\n${JSON.stringify(values, null, 2)}`)
-      resolve()
-    }, 500)
+
+const showResults = (values) => {
+  api.UserCreate(values).then((result) =>{
+    if (result.status !== 200){
+      throw new Error('invalid paramater');
+    }
+    return result.text();
+  }).catch((error) => {
+    alert(error.message)
   });
+};
 
 const FieldLevelValidationForm = require('./components/FieldLevelValidationForm').default;
 
