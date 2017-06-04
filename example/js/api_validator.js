@@ -1,11 +1,12 @@
 // This module exports functions that validate goagen_js API params hosted at localhost:8080.
 
+
 export const RequiredError = "missing required parameter";
 export const InvalidEnumValueError = "invalid enum value";
 export const InvalidFormatError = "invalid format";
 export const InvalidPatternError = "invalid pattern";
 export const InvalidRangeError = "range exceeded";
-export const InvalidMinLengthError = "length is less"
+export const InvalidMinLengthError = "length is less";
 export const InvalidMaxLengthError = "length is exceeded";
 export const InvalidKindError = "invalid kind";
 

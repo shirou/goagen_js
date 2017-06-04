@@ -1,13 +1,14 @@
 package goagen_js
 
 const validatorHeaderT = `// This module exports functions that validate {{ .API.Name }} API params hosted at {{ .API.Host }}.
+{{ if eq "flow" .Target }}// @flow {{- end }}
 
 export const RequiredError = "missing required parameter";
 export const InvalidEnumValueError = "invalid enum value";
 export const InvalidFormatError = "invalid format";
 export const InvalidPatternError = "invalid pattern";
 export const InvalidRangeError = "range exceeded";
-export const InvalidMinLengthError = "length is less"
+export const InvalidMinLengthError = "length is less";
 export const InvalidMaxLengthError = "length is exceeded";
 export const InvalidKindError = "invalid kind";
 `
@@ -90,6 +91,7 @@ export function {{ $funcName }}({{ .Args }}) {
 `
 
 const jsHeaderT = `// This module exports functions that give access to the {{ .API.Name }} API hosted at {{ .API.Host }}.
+{{ if eq "flow" .Target }}// @flow {{- end }}
 
 import 'whatwg-fetch';
 
@@ -102,7 +104,10 @@ const urlPrefix = scheme + '://' + host;
 
 const jsModuleT = `
 // helper function for GET method.
-function get(url, payload) {
+{{      if eq "flow" .Target }}function get(url: string, payload: any): Promise<any> {
+{{ else if eq "type" .Target }}function get(url: string, payload: any): Promise<any> {
+{{ else }}function get(url, payload) {
+{{- end }}
   const query = queryBuilder(payload);
   return fetch(url + query, {
     method: 'GET',
@@ -114,7 +119,10 @@ function get(url, payload) {
 }
 
 // helper function for POST method.
-function post(url, payload) {
+{{      if eq "flow" .Target }}function post(url: string, payload: any): Promise<any> {
+{{ else if eq "type" .Target }}function post(url: string, payload: any): Promise<any> {
+{{ else }}function post(url, payload) {
+{{- end }}
   return fetch(url, {
     method: 'POST',
     headers: {
@@ -126,7 +134,10 @@ function post(url, payload) {
 }
 
 // helper functon which return QueryParameter from Object.
-function queryBuilder(obj) {
+{{      if eq "flow" .Target }}function queryBuilder(obj: any): string {
+{{ else if eq "type" .Target }}function queryBuilder(obj: any): string {
+{{ else }}function queryBuilder(obj) {
+{{- end }}
   if (!obj) {
     return '';
   }

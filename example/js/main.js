@@ -18,7 +18,7 @@ const showResults = (values) => {
     if (result.status !== 200){
       throw new Error('invalid paramater');
     }
-    return result.text();
+    alert("OK!")
   }).catch((error) => {
     alert(error.message)
   });

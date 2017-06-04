@@ -38,6 +38,7 @@ func Generate() (files []string, err error) {
 	var (
 		outDir, ver  string
 		scheme, host string
+		target       string
 	)
 
 	set := flag.NewFlagSet("client", flag.PanicOnError)
@@ -46,6 +47,7 @@ func Generate() (files []string, err error) {
 	set.StringVar(&scheme, "scheme", "", "")
 	set.StringVar(&host, "host", "", "")
 	set.StringVar(&ver, "version", "", "")
+	set.StringVar(&target, "target", "js", "target language(js, flow, type)")
 	set.Parse(os.Args[1:])
 
 	// First check compatibility
@@ -59,6 +61,7 @@ func Generate() (files []string, err error) {
 		Scheme: scheme,
 		Host:   host,
 		API:    design.Design,
+		Target: target,
 	}
 
 	return g.Generate()
@@ -131,6 +134,7 @@ func (g *Generator) generateRequestJS(jsFile string, params []ParamsDefinition) 
 		"API":    g.API,
 		"Host":   g.Host,
 		"Scheme": g.Scheme,
+		"Target": g.Target,
 	}
 	if err = file.ExecuteTemplate("header", jsHeaderT, nil, data); err != nil {
 		return err
@@ -172,7 +176,8 @@ func (g *Generator) generateValidateJS(jsFile string, params []ParamsDefinition)
 	g.genfiles = append(g.genfiles, jsFile)
 
 	data := map[string]interface{}{
-		"API": g.API,
+		"API":    g.API,
+		"Target": g.Target,
 	}
 	if err := file.ExecuteTemplate("header", validatorHeaderT, nil, data); err != nil {
 		return err

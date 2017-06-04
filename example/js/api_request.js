@@ -1,5 +1,6 @@
 // This module exports functions that give access to the goagen_js API hosted at localhost:8080.
 
+
 import 'whatwg-fetch';
 
 import * as v from "./api_validator.js";
@@ -23,7 +24,7 @@ export function UserCreate(payload) {
 // UserGet
 // userID(number): 
 // payload(object): payload
-export function UserGet(userID) {
+export function UserGet(userID: number) {
   const url = urlPrefix + `/user/${userID}`;
   let e = undefined;
   e = v.validate(v.UserGet.userID, userID);
@@ -41,7 +42,8 @@ export function UserList() {
 }
 
 // helper function for GET method.
-function get(url, payload) {
+function get(url: string, payload: any): Promise<any> {
+
   const query = queryBuilder(payload);
   return fetch(url + query, {
     method: 'GET',
@@ -53,7 +55,8 @@ function get(url, payload) {
 }
 
 // helper function for POST method.
-function post(url, payload) {
+function post(url: string, payload: any): Promise<any> {
+
   return fetch(url, {
     method: 'POST',
     headers: {
@@ -65,7 +68,8 @@ function post(url, payload) {
 }
 
 // helper functon which return QueryParameter from Object.
-function queryBuilder(obj) {
+function queryBuilder(obj: any): string {
+
   if (!obj) {
     return '';
   }

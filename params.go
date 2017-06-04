@@ -9,6 +9,12 @@ import (
 	"github.com/goadesign/goa/goagen/codegen"
 )
 
+const (
+	TargetJS   = "js"
+	TargetFlow = "flow"
+	TargetTS   = "type"
+)
+
 type ParamsDefinition struct {
 	Action    *design.ActionDefinition
 	Base      string
@@ -124,10 +130,26 @@ func (p ParamsDefinition) FuncName() string {
 func (p ParamsDefinition) FuncArgs(target string) string {
 	ret := make([]string, len(p.Path))
 	for i, p := range p.Path {
-		ret[i] = p.Name
+		switch target {
+		case TargetFlow:
+			ret[i] = fmt.Sprintf("%s: %s", p.Name, p.Kind)
+		case TargetTS:
+			ret[i] = fmt.Sprintf("%s: %s", p.Name, p.Kind)
+		default:
+			ret[i] = p.Name
+		}
 	}
 	if len(p.Query) > 0 {
-		ret = append(ret, "payload")
+		var p string
+		switch target {
+		case TargetFlow:
+			p = "payload: any" // TODO
+		case TargetJS:
+			p = "payload: any" // TODO: should define interface?
+		default:
+			p = "payload"
+		}
+		ret = append(ret, p)
 	}
 
 	return strings.Join(ret, ", ")
