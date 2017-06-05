@@ -20,11 +20,10 @@ export function UserCreate(payload) {
   }
   return post(url, payload);
 }
-
 // UserGet
 // userID(number): 
 // payload(object): payload
-export function UserGet(userID: number) {
+export function UserGet(userID) {
   const url = urlPrefix + `/user/${userID}`;
   let e = undefined;
   e = v.validate(v.UserGet.userID, userID);
@@ -33,17 +32,13 @@ export function UserGet(userID: number) {
   }
   return get(url);
 }
-
 // UserList
 // payload(object): payload
 export function UserList() {
   const url = urlPrefix + `/user`;
   return get(url);
-}
-
-// helper function for GET method.
-function get(url: string, payload: any): Promise<any> {
-
+}// helper function for GET method.
+function get(url, payload) {
   const query = queryBuilder(payload);
   return fetch(url + query, {
     method: 'GET',
@@ -55,8 +50,7 @@ function get(url: string, payload: any): Promise<any> {
 }
 
 // helper function for POST method.
-function post(url: string, payload: any): Promise<any> {
-
+function post(url, payload) {
   return fetch(url, {
     method: 'POST',
     headers: {
@@ -68,8 +62,7 @@ function post(url: string, payload: any): Promise<any> {
 }
 
 // helper functon which return QueryParameter from Object.
-function queryBuilder(obj: any): string {
-
+function queryBuilder(obj) {
   if (!obj) {
     return '';
   }

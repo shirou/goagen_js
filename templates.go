@@ -1,8 +1,51 @@
 package goagen_js
 
-const validatorHeaderT = `// This module exports functions that validate {{ .API.Name }} API params hosted at {{ .API.Host }}.
-{{ if eq "flow" .Target }}// @flow {{- end }}
+import (
+	"fmt"
+	"strings"
+	"text/template"
+)
 
+func newTemplate(args ...string) (*template.Template, error) {
+	tmpl := template.New("")
+	tmpl.Funcs(template.FuncMap{
+		"join": func(value []string, arg string) string {
+			return strings.Join(value, arg)
+		},
+	})
+	for _, t := range args {
+		var err error
+		tmpl, err = tmpl.Parse(t)
+		if err != nil {
+			return nil, fmt.Errorf("tmpl.Parse() failed: %+v, %v", t, err)
+		}
+	}
+	return tmpl, nil
+}
+
+const validatorHeaderT = `{{- define "validator_header" -}}
+// This module exports functions that validate {{ .API.Name }} API params hosted at {{ .API.Host }}.
+{{      if eq "flow" .Target }}{{ template "header_flow" . }}
+{{ else if eq "type" .Target }}{{ template "header_type" . }}
+{{- end }}
+{{ end }}
+`
+
+const validatorHeaderFlow = `{{- define "header_flow" }}
+// @flow
+{{ end -}}
+`
+const validatorHeaderTypeScript = `{{- define "header_type" }}
+// typescript
+{{ end -}}
+`
+
+const validatorT = `{{- define "validator_definition" }}
+export const {{ .Name }} = {{ .Constraint }};
+{{ end }}
+`
+
+const validatorModuleT = `{{ define "validator_module" }}
 export const RequiredError = "missing required parameter";
 export const InvalidEnumValueError = "invalid enum value";
 export const InvalidFormatError = "invalid format";
@@ -11,13 +54,7 @@ export const InvalidRangeError = "range exceeded";
 export const InvalidMinLengthError = "length is less";
 export const InvalidMaxLengthError = "length is exceeded";
 export const InvalidKindError = "invalid kind";
-`
-
-const validatorT = `
-export const {{ .Name }} = {{ .Constraint }};
-`
-
-const validatorModuleT = `export function validate(rule, actual) {
+export function validate(rule, actual) {
   let errors = {};
   if (typeof actual === "object") {
     Object.keys(actual).forEach(function(key, index) {
@@ -64,9 +101,11 @@ const validatorModuleT = `export function validate(rule, actual) {
   }
   return undefined;
 }
+{{- end -}}
 `
 
-const jsFuncsT = `{{ $funcName := .FuncName }}
+const jsFuncsT = `{{ define "js_funcs" -}}
+{{ $funcName := .FuncName }}
 // {{join .Comments "\n// "}}
 export function {{ $funcName }}({{ .Args }}) {
   const url = urlPrefix + {{ .UrlArgs }};
@@ -88,9 +127,11 @@ export function {{ $funcName }}({{ .Args }}) {
 {{- end }}
   return {{ .Request }};
 }
+{{- end }}
 `
 
-const jsHeaderT = `// This module exports functions that give access to the {{ .API.Name }} API hosted at {{ .API.Host }}.
+const jsHeaderT = `{{- define "js_header" -}}
+// This module exports functions that give access to the {{ .API.Name }} API hosted at {{ .API.Host }}.
 {{ if eq "flow" .Target }}// @flow {{- end }}
 
 import 'whatwg-fetch';
@@ -100,9 +141,10 @@ import * as v from "./api_validator.js";
 const scheme = '{{ .Scheme }}';
 const host = '{{ .Host }}';
 const urlPrefix = scheme + '://' + host;
+{{ end }}
 `
 
-const jsModuleT = `
+const jsModuleT = `{{- define "js_module" -}}
 // helper function for GET method.
 {{      if eq "flow" .Target }}function get(url: string, payload: any): Promise<any> {
 {{ else if eq "type" .Target }}function get(url: string, payload: any): Promise<any> {
@@ -158,4 +200,5 @@ const jsModuleT = `
   }
   return '';
 }
+{{ end -}}
 `

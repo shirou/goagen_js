@@ -144,7 +144,7 @@ func (p ParamsDefinition) FuncArgs(target string) string {
 		switch target {
 		case TargetFlow:
 			p = "payload: any" // TODO
-		case TargetJS:
+		case TargetTS:
 			p = "payload: any" // TODO: should define interface?
 		default:
 			p = "payload"
