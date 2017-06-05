@@ -102,10 +102,38 @@ In the `api_validation.js`, there are many `rules` for each APIs and a `validate
 This validate function is used in `api_request.js`. Also you can use to validate before request, for example Form Validation.
 
 
-Type
-``````````
+Type Anotaion
+````````````````````
+
+If `flow` or `type` is specified with `--target` option, type anotation and definition files are generated.
+
+::
+
+  goagen gen --pkg-path=github.com/shirou/goagen_js -d github.com/shirou/goagen_js/example/design -- --target flow
+
+  or
+  goagen gen --pkg-path=github.com/shirou/goagen_js -d github.com/shirou/goagen_js/example/design -- --target type --genout ts
+  # genout is used to specify output directory name
 
 
+Then, all of your methods are type anotated like this.
+
+::
+
+  export function UserCreate(userID: number, payload: UserCreatePayload) {
+
+  }
+
+Payload are defined on `api.d.ts` file. This is typescript example
+
+::
+
+  declare namespace UserCreatePayload {
+    let name: string;
+    let age: number;
+    let email: string;
+    let sex: string;
+  }
 
 
 LICENSE
