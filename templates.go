@@ -25,19 +25,10 @@ func newTemplate(args ...string) (*template.Template, error) {
 
 const validatorHeaderT = `{{- define "validator_header" -}}
 // This module exports functions that validate {{ .API.Name }} API params hosted at {{ .API.Host }}.
-{{      if eq "flow" .Target }}{{ template "header_flow" . }}
-{{ else if eq "type" .Target }}{{ template "header_type" . }}
+{{      if eq "flow" .Target }}// @flow
+{{ else if eq "type" .Target }}///<reference path="api.d.ts" />
 {{- end }}
 {{ end }}
-`
-
-const validatorHeaderFlow = `{{- define "header_flow" }}
-// @flow
-{{ end -}}
-`
-const validatorHeaderTypeScript = `{{- define "header_type" }}
-// typescript
-{{ end -}}
 `
 
 const validatorT = `{{- define "validator_definition" }}
@@ -54,8 +45,13 @@ export const InvalidRangeError = "range exceeded";
 export const InvalidMinLengthError = "length is less";
 export const InvalidMaxLengthError = "length is exceeded";
 export const InvalidKindError = "invalid kind";
-export function validate(rule, actual) {
+{{      if eq "flow" .Target }}export function validate(rule: any, actual: any) {
   let errors = {};
+{{ else if eq "type" .Target }}export function validate(rule: any, actual: any) {
+  let errors = {};
+{{ else }}export function validate(rule, actual) {
+  let errors = {};
+{{ end }}
   if (typeof actual === "object") {
     Object.keys(actual).forEach(function(key, index) {
       const ret = validate(rule[key], actual[key]);
@@ -132,7 +128,9 @@ export function {{ $funcName }}({{ .Args }}) {
 
 const jsHeaderT = `{{- define "js_header" -}}
 // This module exports functions that give access to the {{ .API.Name }} API hosted at {{ .API.Host }}.
-{{ if eq "flow" .Target }}// @flow {{- end }}
+{{      if eq "flow" .Target }}// @flow
+{{ else if eq "type" .Target }}///<reference path="api.d.ts" />
+{{- end }}
 
 import 'whatwg-fetch';
 
@@ -144,7 +142,7 @@ const urlPrefix = scheme + '://' + host;
 {{ end }}
 `
 
-const jsModuleT = `{{- define "js_module" -}}
+const jsModuleT = `{{ define "js_module" }}
 // helper function for GET method.
 {{      if eq "flow" .Target }}function get(url: string, payload: any): Promise<any> {
 {{ else if eq "type" .Target }}function get(url: string, payload: any): Promise<any> {
@@ -201,4 +199,30 @@ const jsModuleT = `{{- define "js_module" -}}
   return '';
 }
 {{ end -}}
+`
+
+const definitionHeaderFlow = `{{ define "definition_header"}}
+{{ end }}
+`
+
+const definitionFlow = `{{ define "definition"}}
+type {{ .Name}}Payload = {
+{{- range $p := .PayloadDefinition }}
+  {{ $p }}
+{{- end }}
+};
+{{ end }}
+`
+
+const definitionHeaderType = `{{ define "definition_header"}}
+{{ end }}
+`
+
+const definitionType = `{{ define "definition"}}
+declare namespace {{ .Name}}Payload {
+{{- range $p := .PayloadDefinition }}
+  {{ $p }}
+{{- end }}
+}
+{{ end }}
 `

@@ -1,6 +1,5 @@
 // This module exports functions that give access to the goagen_js API hosted at localhost:8080.
-// @flow
-
+///<reference path="api.d.ts" />
 
 import 'whatwg-fetch';
 
@@ -12,7 +11,7 @@ const urlPrefix = scheme + '://' + host;
 
 // UserCreate
 // payload(object): payload
-export function UserCreate(payload: UserCreatePayload) {
+export function UserCreate(payload: any) {
   const url = urlPrefix + `/user`;
   let e = undefined;
   e = v.validate(v.UserCreate.payload, payload);

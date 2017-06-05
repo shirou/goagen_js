@@ -1,6 +1,5 @@
 // This module exports functions that validate goagen_js API params hosted at localhost:8080.
-// @flow
-
+///<reference path="api.d.ts" />
 
 export const UserCreate = {
    "payload": {

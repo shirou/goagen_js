@@ -47,7 +47,6 @@ func parseActions(g *Generator) ([]ParamsDefinition, error) {
 }
 
 func parseAction(action *design.ActionDefinition, target string) (ParamsDefinition, error) {
-
 	name := codegen.Goify(action.Parent.Name, true) + codegen.Goify(action.Name, true)
 
 	ret := ParamsDefinition{
@@ -127,6 +126,21 @@ func (p ParamsDefinition) FuncName() string {
 	return p.Name
 }
 
+func (p ParamsDefinition) PayloadDefinition(target string) []string {
+	buf := make([]string, 0)
+
+	for _, tmp := range p.Query {
+		switch target {
+		case TargetFlow:
+			buf = append(buf, fmt.Sprintf("%s: %s,", tmp.Name, tmp.Kind))
+		case TargetTS:
+			buf = append(buf, fmt.Sprintf("let %s: %s;", tmp.Name, tmp.Kind))
+		}
+	}
+
+	return buf
+}
+
 func (p ParamsDefinition) FuncArgs(target string) string {
 	ret := make([]string, len(p.Path))
 	for i, p := range p.Path {
@@ -140,16 +154,16 @@ func (p ParamsDefinition) FuncArgs(target string) string {
 		}
 	}
 	if len(p.Query) > 0 {
-		var p string
+		var tmp string
 		switch target {
 		case TargetFlow:
-			p = "payload: any" // TODO
+			tmp = fmt.Sprintf("payload: %sPayload", p.Name) // TODO
 		case TargetTS:
-			p = "payload: any" // TODO: should define interface?
+			tmp = "payload: any" // TODO: should define interface?
 		default:
-			p = "payload"
+			tmp = "payload"
 		}
-		ret = append(ret, p)
+		ret = append(ret, tmp)
 	}
 
 	return strings.Join(ret, ", ")

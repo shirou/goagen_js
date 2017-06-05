@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"text/template"
 
 	"github.com/goadesign/goa/design"
 	"github.com/goadesign/goa/goagen/codegen"
@@ -104,15 +105,34 @@ func (g *Generator) Generate() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+	requestJS := "api_request.js"
+	validatorJS := "api_validator.js"
+	definitionJS := ""
+
+	switch g.Target {
+	case TargetFlow:
+		definitionJS = "api.d.js"
+	case TargetTS:
+		requestJS = "api_request.ts"
+		validatorJS = "api_validator.ts"
+		definitionJS = "api.d.ts"
+	}
 
 	// Generate api_request.js
-	if err := g.generateRequestJS(filepath.Join(g.OutDir, "api_request.js"), ps); err != nil {
+	if err := g.generateRequestJS(filepath.Join(g.OutDir, requestJS), ps); err != nil {
 		return nil, err
 	}
 
 	// Generate validate.js
-	if err := g.generateValidateJS(filepath.Join(g.OutDir, "api_validator.js"), ps); err != nil {
+	if err := g.generateValidateJS(filepath.Join(g.OutDir, validatorJS), ps); err != nil {
 		return nil, err
+	}
+
+	// Generate definition
+	if definitionJS != "" {
+		if err := g.generateDefinition(filepath.Join(g.OutDir, definitionJS), ps); err != nil {
+			return nil, err
+		}
 	}
 
 	return g.genfiles, nil
@@ -186,8 +206,6 @@ func (g *Generator) generateValidateJS(jsFile string, params []ParamsDefinition)
 		validatorHeaderT,
 		validatorT,
 		validatorModuleT,
-		validatorHeaderFlow,
-		validatorHeaderTypeScript,
 	)
 	if err != nil {
 		return err
@@ -211,6 +229,58 @@ func (g *Generator) generateValidateJS(jsFile string, params []ParamsDefinition)
 	}
 	if err := tmpl.ExecuteTemplate(buf, "validator_module", data); err != nil {
 		return err
+	}
+
+	return buf.Flush()
+}
+
+func (g *Generator) generateDefinition(jsFile string, params []ParamsDefinition) error {
+	file, err := openFile(jsFile)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	buf := bufio.NewWriter(file)
+	g.genfiles = append(g.genfiles, jsFile)
+
+	data := map[string]interface{}{
+		"API":    g.API,
+		"Target": g.Target,
+	}
+
+	var tmpl *template.Template
+	switch g.Target {
+	case TargetFlow:
+		tmpl, err = newTemplate(
+			definitionHeaderFlow,
+			definitionFlow,
+		)
+	case TargetTS:
+		tmpl, err = newTemplate(
+			definitionHeaderType,
+			definitionType,
+		)
+	default:
+		return fmt.Errorf("unknown type language: %s", g.Target)
+	}
+	if err != nil {
+		return err
+	}
+
+	if err := tmpl.ExecuteTemplate(buf, "definition_header", data); err != nil {
+		return err
+	}
+	for _, p := range params {
+		if len(p.Query) == 0 {
+			continue
+		}
+		data := map[string]interface{}{
+			"Name":              p.FuncName(),
+			"PayloadDefinition": p.PayloadDefinition(g.Target),
+		}
+		if err := tmpl.ExecuteTemplate(buf, "definition", data); err != nil {
+			return err
+		}
 	}
 
 	return buf.Flush()
