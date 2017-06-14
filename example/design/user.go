@@ -7,18 +7,18 @@ import (
 
 func defineUserTrait() {
 	Trait("UserTrait", func() {
-		Attribute("name", String, func() {
+		Attribute("name", String, "name", func() {
 			MinLength(4)
 			MaxLength(16)
 		})
-		Attribute("age", Integer, func() {
+		Attribute("age", Integer, "age", func() {
 			Minimum(20)
 			Maximum(70)
 		})
-		Attribute("email", String, func() {
+		Attribute("email", String, "email", func() {
 			Pattern(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 		})
-		Attribute("sex", String, func() {
+		Attribute("sex", String, "sex", func() {
 			Enum("male", "female", "other")
 		})
 		Required("name")
@@ -53,7 +53,7 @@ var _ = Resource("user", func() {
 	Action("get", func() {
 		Routing(GET(":UserID"))
 		Params(func() {
-			Param("UserID", Integer, func() {
+			Param("UserID", Integer, "ID of user", func() {
 				Maximum(10000)
 			})
 			Required("UserID")

@@ -1,5 +1,4 @@
 // This module exports functions that validate goagen_js API params hosted at localhost:8080.
-// @flow
 
 
 export const UserCreate = {
@@ -46,7 +45,7 @@ export const InvalidRangeError = "range exceeded";
 export const InvalidMinLengthError = "length is less";
 export const InvalidMaxLengthError = "length is exceeded";
 export const InvalidKindError = "invalid kind";
-export function validate(rule: any, actual: any) {
+export function validate(rule, actual) {
   let errors = {};
 
   if (typeof actual === "object") {

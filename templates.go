@@ -47,8 +47,8 @@ export const InvalidMaxLengthError = "length is exceeded";
 export const InvalidKindError = "invalid kind";
 {{      if eq "flow" .Target }}export function validate(rule: any, actual: any) {
   let errors = {};
-{{ else if eq "type" .Target }}export function validate(rule: any, actual: any) {
-  let errors = {};
+{{ else if eq "type" .Target }}export function validate(rule: any, actual: any): ErrorMap | undefined {
+  let errors: ErrorMap = {};
 {{ else }}export function validate(rule, actual) {
   let errors = {};
 {{ end }}
@@ -109,7 +109,7 @@ export function {{ $funcName }}({{ .Args }}) {
 {{- if eq .ValidateRequired true }}
   let e = undefined;
 {{- range $p := .PathParams }}
-  e = v.validate(v.{{ $funcName }}.{{ $p.Name }}, {{ $p.Name }});
+  e = v.validate(v.{{ $funcName }}.{{ $p.CamelCaseName }}, {{ $p.Name }});
   if (e) {
     return Promise.reject(e);
   }
@@ -129,12 +129,14 @@ export function {{ $funcName }}({{ .Args }}) {
 const jsHeaderT = `{{- define "js_header" -}}
 // This module exports functions that give access to the {{ .API.Name }} API hosted at {{ .API.Host }}.
 {{      if eq "flow" .Target }}// @flow
+import * as v from "./api_validator.js";
 {{ else if eq "type" .Target }}///<reference path="api.d.ts" />
+import * as v from "./api_validator.ts";
+{{ else }}
+import * as v from "./api_validator.js";
 {{- end }}
 
 import 'whatwg-fetch';
-
-import * as v from "./api_validator.js";
 
 const scheme = '{{ .Scheme }}';
 const host = '{{ .Host }}';
@@ -144,8 +146,8 @@ const urlPrefix = scheme + '://' + host;
 
 const jsModuleT = `{{ define "js_module" }}
 // helper function for GET method.
-{{      if eq "flow" .Target }}function get(url: string, payload: any): Promise<any> {
-{{ else if eq "type" .Target }}function get(url: string, payload: any): Promise<any> {
+{{      if eq "flow" .Target }}function get(url: string, payload?: any): Promise<any> {
+{{ else if eq "type" .Target }}function get(url: string, payload?: any): Promise<any> {
 {{ else }}function get(url, payload) {
 {{- end }}
   const query = queryBuilder(payload);
@@ -159,8 +161,8 @@ const jsModuleT = `{{ define "js_module" }}
 }
 
 // helper function for POST method.
-{{      if eq "flow" .Target }}function post(url: string, payload: any): Promise<any> {
-{{ else if eq "type" .Target }}function post(url: string, payload: any): Promise<any> {
+{{      if eq "flow" .Target }}function post(url: string, payload?: any): Promise<any> {
+{{ else if eq "type" .Target }}function post(url: string, payload?: any): Promise<any> {
 {{ else }}function post(url, payload) {
 {{- end }}
   return fetch(url, {
@@ -215,11 +217,22 @@ type {{ .Name}}Payload = {
 `
 
 const definitionHeaderType = `{{ define "definition_header"}}
+declare class ErrorMap {
+   kind?: string;
+   maximum?: string;
+   minimum?: string;
+   max_length?: string;
+   min_length?: string;
+   format?: string;
+   pattern?: string;
+   enum?: string;
+   [key: string]: ErrorMap | string | undefined;
+}
 {{ end }}
 `
 
 const definitionType = `{{ define "definition"}}
-declare namespace {{ .Name}}Payload {
+interface {{ .Name}}Payload {
 {{- range $p := .PayloadDefinition }}
   {{ $p }}
 {{- end }}

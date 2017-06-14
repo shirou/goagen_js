@@ -1,6 +1,7 @@
 package goagen_js
 
 import (
+	"encoding/json"
 	"fmt"
 	"sort"
 	"strings"
@@ -134,7 +135,11 @@ func (p ParamsDefinition) PayloadDefinition(target string) []string {
 		case TargetFlow:
 			buf = append(buf, fmt.Sprintf("%s: %s,", tmp.Name, tmp.Kind))
 		case TargetTS:
-			buf = append(buf, fmt.Sprintf("let %s: %s;", tmp.Name, tmp.Kind))
+			if tmp.Enum == "" {
+				buf = append(buf, fmt.Sprintf("%s: %s;", tmp.Name, tmp.Kind))
+			} else {
+				buf = append(buf, fmt.Sprintf("%s: %s;", tmp.Name, tmp.Enum))
+			}
 		}
 	}
 
@@ -221,19 +226,36 @@ func convertTypeString(t design.Kind, target string) string {
 }
 
 type Param struct {
-	original    *design.AttributeDefinition
-	Name        string // CamelCase name
-	Kind        string // kind such as bool, number, ...
-	Description string
+	original      *design.AttributeDefinition
+	Name          string // no CamelCase name
+	CamelCaseName string // CamelCase name
+	Kind          string // kind such as bool, number, ...
+	Description   string
+	Enum          string // Enum name
 }
 
 type Params []Param
 
 func newParam(action *design.ActionDefinition, target string, a string, att *design.AttributeDefinition) Param {
-	return Param{
-		original:    att,
-		Name:        codegen.Goify(a, false),
-		Kind:        convertTypeString(att.Type.Kind(), target),
-		Description: att.Description,
+	p := Param{
+		original:      att,
+		Name:          codegen.Goify(a, false),
+		CamelCaseName: codegen.Goify(a, true),
+		Kind:          convertTypeString(att.Type.Kind(), target),
+		Description:   att.Description,
 	}
+
+	if att.Validation != nil && att.Validation.Values != nil {
+		p.Enum = enumValues(att.Validation.Values)
+	}
+
+	return p
+}
+
+func enumValues(value interface{}) string {
+	j, err := json.Marshal(value)
+	if err == nil {
+		return string(j)
+	}
+	return "[]"
 }

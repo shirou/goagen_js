@@ -7,6 +7,7 @@
   "scripts": {
     "lint": "$(npm bin)/eslint js/*.js",
     "watch": "NODE_ENV=development webpack --progress --hide-modules --watch",
+    "watchts": "NODE_ENV=development webpack --progress --hide-modules --watch --config ./webpack.config.ts.js",
     "flow": "flow"
   },
   "dependencies": {
@@ -21,6 +22,10 @@
     "whatwg-fetch": "^2.0.2"
   },
   "devDependencies": {
+    "@types/react": "^15.0.28",
+    "@types/react-dom": "^15.5.0",
+    "@types/react-redux": "^4.4.43",
+    "@types/redux-form": "^6.6.2",
     "babel-cli": "^6.24.1",
     "babel-core": "^6.0.0",
     "babel-eslint": "^7.2.3",
@@ -42,6 +47,8 @@
     "flow-bin": "^0.47.0",
     "redux": "^3.6.0",
     "redux-form": "^6.7.0",
+    "ts-loader": "^2.1.0",
+    "typescript": "^2.3.4",
     "webpack": "^2.3.1"
   }
 }

@@ -45,8 +45,8 @@ export const InvalidRangeError = "range exceeded";
 export const InvalidMinLengthError = "length is less";
 export const InvalidMaxLengthError = "length is exceeded";
 export const InvalidKindError = "invalid kind";
-export function validate(rule: any, actual: any) {
-  let errors = {};
+export function validate(rule: any, actual: any): ErrorMap | undefined {
+  let errors: ErrorMap = {};
 
   if (typeof actual === "object") {
     Object.keys(actual).forEach(function(key, index) {

@@ -1,10 +1,8 @@
 // This module exports functions that give access to the goagen_js API hosted at localhost:8080.
-// @flow
-
-
-import 'whatwg-fetch';
 
 import * as v from "./api_validator.js";
+
+import 'whatwg-fetch';
 
 const scheme = 'http';
 const host = 'localhost:8080';
@@ -12,7 +10,7 @@ const urlPrefix = scheme + '://' + host;
 
 // UserCreate
 // payload(object): payload
-export function UserCreate(payload: UserCreatePayload) {
+export function UserCreate(payload) {
   const url = urlPrefix + `/user`;
   let e = undefined;
   e = v.validate(v.UserCreate.payload, payload);
@@ -22,12 +20,12 @@ export function UserCreate(payload: UserCreatePayload) {
   return post(url, payload);
 }
 // UserGet
-// userID(number): 
+// userID(number): ID of user
 // payload(object): payload
-export function UserGet(userID: number) {
+export function UserGet(userID) {
   const url = urlPrefix + `/user/${userID}`;
   let e = undefined;
-  e = v.validate(v.UserGet.userID, userID);
+  e = v.validate(v.UserGet.UserID, userID);
   if (e) {
     return Promise.reject(e);
   }
@@ -40,8 +38,7 @@ export function UserList() {
   return get(url);
 }
 // helper function for GET method.
-function get(url: string, payload: any): Promise<any> {
-
+function get(url, payload) {
   const query = queryBuilder(payload);
   return fetch(url + query, {
     method: 'GET',
@@ -53,8 +50,7 @@ function get(url: string, payload: any): Promise<any> {
 }
 
 // helper function for POST method.
-function post(url: string, payload: any): Promise<any> {
-
+function post(url, payload) {
   return fetch(url, {
     method: 'POST',
     headers: {
@@ -66,8 +62,7 @@ function post(url: string, payload: any): Promise<any> {
 }
 
 // helper functon which return QueryParameter from Object.
-function queryBuilder(obj: any): string {
-
+function queryBuilder(obj) {
   if (!obj) {
     return '';
   }
