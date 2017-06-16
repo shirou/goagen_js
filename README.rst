@@ -112,6 +112,7 @@ If `flow` or `type` is specified with `--target` option, type anotation and defi
   goagen gen --pkg-path=github.com/shirou/goagen_js -d github.com/shirou/goagen_js/example/design -- --target flow
 
   or
+
   goagen gen --pkg-path=github.com/shirou/goagen_js -d github.com/shirou/goagen_js/example/design -- --target type --genout ts
   # genout is used to specify output directory name
 
@@ -120,8 +121,9 @@ Then, all of your methods are type anotated like this.
 
 ::
 
-  export function UserCreate(userID: number, payload: UserCreatePayload) {
+  export function UserCreate(userID: number, payload: UserCreatePayload): Promise<any> {
 
+     ...
   }
 
 Payload are defined on `api.d.ts` file. This is typescript example
@@ -129,10 +131,10 @@ Payload are defined on `api.d.ts` file. This is typescript example
 ::
 
   declare namespace UserCreatePayload {
-    let name: string;
-    let age: number;
-    let email: string;
-    let sex: string;
+    name: string;
+    age: number;
+    email: string;
+    sex: ["male","female","other"];
   }
 
 
