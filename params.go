@@ -237,11 +237,18 @@ func (p ParamsDefinition) ResponseDefinition(target string) []string {
 
 func (p ParamsDefinition) FuncRet(target string) string {
 	if p.Response == nil {
-		return ""
+		switch target {
+		case TargetFlow:
+			return ":Promise<any>"
+		case TargetTS:
+			return ":Promise<any>"
+		default:
+			return ""
+		}
 	}
-
 	switch target {
 	case TargetFlow:
+
 		return fmt.Sprintf(":Promise<%s>", p.Response.IdentifierName)
 	case TargetTS:
 		return fmt.Sprintf(":Promise<%s>", p.Response.IdentifierName)

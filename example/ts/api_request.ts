@@ -11,7 +11,7 @@ const urlPrefix = scheme + '://' + host;
 // UserCreate
 // type_(string): type of user
 // payload(object): payload
-export function UserCreate(type_: string, payload: UserCreatePayload) {
+export function UserCreate(type_: string, payload: UserCreatePayload):Promise<any> {
   const url = urlPrefix + `/user/create/${type_}`;
   let e = undefined;
   e = v.validate(v.UserCreate.Type, type_);

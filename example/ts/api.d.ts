@@ -19,15 +19,15 @@ interface UserCreatePayload {
 }
 
 interface UserMedia {
+  email: string;
   age: number;
   sex: string;
   name: string;
-  email: string;
 }
 
 interface UserTypeCollectionMedia {
+  name: string;
   email: string;
   age: number;
   sex: string;
-  name: string;
 }
