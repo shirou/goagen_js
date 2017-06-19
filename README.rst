@@ -13,6 +13,9 @@ Generated JS code are using
 You need to *compile* using babel, webpack, or other tool. This compilation is a standard way on the modern JavaScript era.
 
 
+Presentation Slide: https://speakerdeck.com/shirou/generate-better-javascript-from-goa-design
+
+
 Status
 ------------------
 

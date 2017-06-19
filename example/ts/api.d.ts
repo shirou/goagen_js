@@ -12,10 +12,10 @@ declare class ErrorMap {
 }
 
 interface UserCreatePayload {
-  age: number;
-  email: string;
   sex: ["male","female","other"];
   name: string;
+  age: number;
+  email: string;
 }
 
 interface UserMedia {
@@ -26,8 +26,8 @@ interface UserMedia {
 }
 
 interface UserTypeCollectionMedia {
-  name: string;
   email: string;
   age: number;
   sex: string;
+  name: string;
 }

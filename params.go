@@ -13,7 +13,7 @@ import (
 const (
 	TargetJS   = "js"
 	TargetFlow = "flow"
-	TargetTS   = "type"
+	TargetTS   = "typescript"
 )
 
 type ParamsDefinition struct {
