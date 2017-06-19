@@ -121,7 +121,7 @@ Then, all of your methods are type anotated like this.
 
 ::
 
-  export function UserCreate(userID: number, payload: UserCreatePayload): Promise<any> {
+  export function UserCreate(userID: number, payload: UserCreatePayload): Promise<UserCreateMedia> {
 
      ...
   }
@@ -131,10 +131,10 @@ Payload are defined on `api.d.ts` file. This is typescript example
 ::
 
   declare namespace UserCreatePayload {
-    name: string;
     age: number;
     email: string;
     sex: ["male","female","other"];
+    name: string;
   }
 
 

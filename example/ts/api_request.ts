@@ -10,10 +10,15 @@ const host = 'localhost:8080';
 const urlPrefix = scheme + '://' + host;
 
 // UserCreate
+// type_(string): type of user
 // payload(object): payload
-export function UserCreate(payload: any) {
-  const url = urlPrefix + `/user`;
+export function UserCreate(type_: string, payload: UserCreatePayload) {
+  const url = urlPrefix + `/user/create/${type_}`;
   let e = undefined;
+  e = v.validate(v.UserCreate.Type, type_);
+  if (e) {
+    return Promise.reject(e);
+  }
   e = v.validate(v.UserCreate.payload, payload);
   if (e) {
     return Promise.reject(e);
@@ -23,7 +28,7 @@ export function UserCreate(payload: any) {
 // UserGet
 // userID(number): ID of user
 // payload(object): payload
-export function UserGet(userID: number) {
+export function UserGet(userID: number):Promise<UserMedia> {
   const url = urlPrefix + `/user/${userID}`;
   let e = undefined;
   e = v.validate(v.UserGet.UserID, userID);
@@ -34,7 +39,7 @@ export function UserGet(userID: number) {
 }
 // UserList
 // payload(object): payload
-export function UserList() {
+export function UserList():Promise<UserTypeCollectionMedia> {
   const url = urlPrefix + `/user`;
   return get(url);
 }

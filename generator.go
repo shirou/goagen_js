@@ -171,6 +171,7 @@ func (g *Generator) generateRequestJS(jsFile string, params []ParamsDefinition) 
 			"Action":           p.Action,
 			"FuncName":         p.FuncName(),
 			"Args":             p.FuncArgs(g.Target),
+			"FuncRet":          p.FuncRet(g.Target),
 			"UrlArgs":          p.UrlArgs(),
 			"PathParams":       p.Path,
 			"QueryParams":      p.Query,
@@ -271,15 +272,24 @@ func (g *Generator) generateDefinition(jsFile string, params []ParamsDefinition)
 		return err
 	}
 	for _, p := range params {
-		if len(p.Query) == 0 {
-			continue
+		if len(p.Query) > 0 {
+			data := map[string]interface{}{
+				"Name":       p.FuncName() + "Payload",
+				"Definition": p.PayloadDefinition(g.Target),
+			}
+			if err := tmpl.ExecuteTemplate(buf, "definition", data); err != nil {
+				return err
+			}
 		}
-		data := map[string]interface{}{
-			"Name":              p.FuncName(),
-			"PayloadDefinition": p.PayloadDefinition(g.Target),
-		}
-		if err := tmpl.ExecuteTemplate(buf, "definition", data); err != nil {
-			return err
+		if p.Response != nil {
+			// generate Response MediaType
+			data := map[string]interface{}{
+				"Name":       p.Response.IdentifierName,
+				"Definition": p.ResponseDefinition(g.Target),
+			}
+			if err := tmpl.ExecuteTemplate(buf, "definition", data); err != nil {
+				return err
+			}
 		}
 	}
 

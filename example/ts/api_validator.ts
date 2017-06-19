@@ -2,6 +2,13 @@
 ///<reference path="api.d.ts" />
 
 export const UserCreate = {
+   "Type": {
+     "kind": "string",
+     "enum": [
+       "normal",
+       "admin"
+     ]
+   },
    "payload": {
      "age": {
        "kind": "number",

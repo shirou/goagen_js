@@ -23,13 +23,14 @@ type ParamsDefinition struct {
 	Path      Params // sorted by goa order
 	Query     Params // sorted by alphabetical
 	Validator Validator
-	Response  Response
+	Response  *Response
 }
 
 type Response struct {
-	Name       string
-	Identifier string
-	Params     Params
+	Name           string
+	Identifier     string
+	IdentifierName string
+	Params         Params
 }
 
 func parseActions(g *Generator) ([]ParamsDefinition, error) {
@@ -52,8 +53,8 @@ func parseActions(g *Generator) ([]ParamsDefinition, error) {
 			if err != nil {
 				return nil, err
 			}
-			if err := p.SetResponse(responses); err != nil {
-				return nil, err
+			if resp := getResponse(p, responses); resp != nil {
+				p.Response = resp
 			}
 
 			ret = append(ret, p)
@@ -120,7 +121,6 @@ func parseMediaTypes(g *Generator) (map[string]Response, error) {
 		if mt.IsError() {
 			return nil
 		}
-		fmt.Printf("MT: %#v\n", mt.Identifier)
 		err := mt.IterateViews(func(view *design.ViewDefinition) error {
 			params := make(Params, 0)
 			for name, att := range view.Type.ToObject() {
@@ -134,8 +134,9 @@ func parseMediaTypes(g *Generator) (map[string]Response, error) {
 				params = append(params, p)
 			}
 			ret[mt.Identifier] = Response{
-				Identifier: mt.Identifier,
-				Params:     params,
+				Identifier:     mt.Identifier,
+				IdentifierName: toIdentifierName(mt.Identifier),
+				Params:         params,
 			}
 
 			return nil
@@ -148,13 +149,17 @@ func parseMediaTypes(g *Generator) (map[string]Response, error) {
 	return ret, err
 }
 
-func (p ParamsDefinition) SetResponse(responses map[string]Response) error {
+func getResponse(p ParamsDefinition, responses map[string]Response) *Response {
 	if p.Action.Responses != nil {
-		for name, resp := range p.Action.Responses {
+		for _, resp := range p.Action.Responses {
 			if resp.MediaType == "" {
 				continue
 			}
-			fmt.Printf("%s: %#v\n", name, resp)
+			r, ok := responses[resp.MediaType]
+			if !ok {
+				continue
+			}
+			return &r
 		}
 	}
 
@@ -193,7 +198,6 @@ func (p ParamsDefinition) FuncName() string {
 
 func (p ParamsDefinition) PayloadDefinition(target string) []string {
 	buf := make([]string, 0)
-
 	for _, tmp := range p.Query {
 		switch target {
 		case TargetFlow:
@@ -208,6 +212,43 @@ func (p ParamsDefinition) PayloadDefinition(target string) []string {
 	}
 
 	return buf
+}
+
+func (p ParamsDefinition) ResponseDefinition(target string) []string {
+	buf := make([]string, 0)
+	if p.Response.Params == nil {
+		return []string{}
+	}
+	for _, tmp := range p.Response.Params {
+		switch target {
+		case TargetFlow:
+			buf = append(buf, fmt.Sprintf("%s: %s,", tmp.Name, tmp.Kind))
+		case TargetTS:
+			if tmp.Enum == "" {
+				buf = append(buf, fmt.Sprintf("%s: %s;", tmp.Name, tmp.Kind))
+			} else {
+				buf = append(buf, fmt.Sprintf("%s: %s;", tmp.Name, tmp.Enum))
+			}
+		}
+	}
+
+	return buf
+}
+
+func (p ParamsDefinition) FuncRet(target string) string {
+	if p.Response == nil {
+		return ""
+	}
+
+	switch target {
+	case TargetFlow:
+		return fmt.Sprintf(":Promise<%s>", p.Response.IdentifierName)
+	case TargetTS:
+		return fmt.Sprintf(":Promise<%s>", p.Response.IdentifierName)
+	default:
+		return ""
+	}
+
 }
 
 func (p ParamsDefinition) FuncArgs(target string) string {
@@ -226,9 +267,9 @@ func (p ParamsDefinition) FuncArgs(target string) string {
 		var tmp string
 		switch target {
 		case TargetFlow:
-			tmp = fmt.Sprintf("payload: %sPayload", p.Name) // TODO
+			tmp = fmt.Sprintf("payload: %sPayload", p.Name)
 		case TargetTS:
-			tmp = "payload: any" // TODO: should define interface?
+			tmp = fmt.Sprintf("payload: %sPayload", p.Name)
 		default:
 			tmp = "payload"
 		}
@@ -322,4 +363,19 @@ func enumValues(value interface{}) string {
 		return string(j)
 	}
 	return "[]"
+}
+
+// toIdentifierName convert Identifier to CamelCase Name
+// ex: application/vnd.user+json -> UserMedia
+// ex: application/vnd.user+json; type=collection -> CollectionOfUserMedia
+func toIdentifierName(identifier string) string {
+	tmp := design.CanonicalIdentifier(identifier)
+	ret := strings.Replace(tmp, "application/vnd.", "", 1)
+	ret = codegen.Goify(ret, true) + "Media"
+
+	if strings.Contains("type=collection", tmp) {
+		ret = "CollectionOf" + ret
+	}
+
+	return ret
 }

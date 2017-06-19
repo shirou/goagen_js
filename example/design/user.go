@@ -65,7 +65,13 @@ var _ = Resource("user", func() {
 	})
 
 	Action("create", func() {
-		Routing(POST(""))
+		Routing(POST("create/:Type"))
+		Params(func() {
+			Param("Type", String, "type of user", func() {
+				Enum("normal", "admin")
+			})
+			Required("UserID")
+		})
 		Payload(UserCreatePayload, func() {
 			Example(map[string]interface{}{
 				"name": "fooboo",

@@ -103,7 +103,7 @@ export const InvalidKindError = "invalid kind";
 const jsFuncsT = `{{ define "js_funcs" -}}
 {{ $funcName := .FuncName }}
 // {{join .Comments "\n// "}}
-export function {{ $funcName }}({{ .Args }}) {
+export function {{ $funcName }}({{ .Args }}){{ .FuncRet }} {
   const url = urlPrefix + {{ .UrlArgs }};
 
 {{- if eq .ValidateRequired true }}
@@ -232,8 +232,8 @@ declare class ErrorMap {
 `
 
 const definitionType = `{{ define "definition"}}
-interface {{ .Name}}Payload {
-{{- range $p := .PayloadDefinition }}
+interface {{ .Name}} {
+{{- range $p := .Definition }}
   {{ $p }}
 {{- end }}
 }

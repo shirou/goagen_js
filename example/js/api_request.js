@@ -9,10 +9,15 @@ const host = 'localhost:8080';
 const urlPrefix = scheme + '://' + host;
 
 // UserCreate
+// type_(string): type of user
 // payload(object): payload
-export function UserCreate(payload) {
-  const url = urlPrefix + `/user`;
+export function UserCreate(type_, payload) {
+  const url = urlPrefix + `/user/create/${type_}`;
   let e = undefined;
+  e = v.validate(v.UserCreate.Type, type_);
+  if (e) {
+    return Promise.reject(e);
+  }
   e = v.validate(v.UserCreate.payload, payload);
   if (e) {
     return Promise.reject(e);
