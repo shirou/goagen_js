@@ -23,11 +23,23 @@ type ParamsDefinition struct {
 	Path      Params // sorted by goa order
 	Query     Params // sorted by alphabetical
 	Validator Validator
+	Response  Response
+}
+
+type Response struct {
+	Name       string
+	Identifier string
+	Params     Params
 }
 
 func parseActions(g *Generator) ([]ParamsDefinition, error) {
 	ret := make([]ParamsDefinition, 0)
 	actions := getActions(g)
+
+	responses, err := parseMediaTypes(g)
+	if err != nil {
+		return ret, err
+	}
 
 	keys := []string{}
 	for n := range actions {
@@ -40,6 +52,10 @@ func parseActions(g *Generator) ([]ParamsDefinition, error) {
 			if err != nil {
 				return nil, err
 			}
+			if err := p.SetResponse(responses); err != nil {
+				return nil, err
+			}
+
 			ret = append(ret, p)
 		}
 	}
@@ -95,6 +111,54 @@ func parseAction(action *design.ActionDefinition, target string) (ParamsDefiniti
 	}
 
 	return ret, nil
+}
+
+func parseMediaTypes(g *Generator) (map[string]Response, error) {
+	ret := make(map[string]Response)
+
+	err := g.API.IterateMediaTypes(func(mt *design.MediaTypeDefinition) error {
+		if mt.IsError() {
+			return nil
+		}
+		fmt.Printf("MT: %#v\n", mt.Identifier)
+		err := mt.IterateViews(func(view *design.ViewDefinition) error {
+			params := make(Params, 0)
+			for name, att := range view.Type.ToObject() {
+				p := Param{
+					original:      att,
+					Name:          codegen.Goify(name, false),
+					CamelCaseName: codegen.Goify(name, true),
+					Kind:          convertTypeString(att.Type.Kind(), g.Target),
+					Description:   att.Description,
+				}
+				params = append(params, p)
+			}
+			ret[mt.Identifier] = Response{
+				Identifier: mt.Identifier,
+				Params:     params,
+			}
+
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	return ret, err
+}
+
+func (p ParamsDefinition) SetResponse(responses map[string]Response) error {
+	if p.Action.Responses != nil {
+		for name, resp := range p.Action.Responses {
+			if resp.MediaType == "" {
+				continue
+			}
+			fmt.Printf("%s: %#v\n", name, resp)
+		}
+	}
+
+	return nil
 }
 
 func (p ParamsDefinition) Comments(action *design.ActionDefinition) []string {

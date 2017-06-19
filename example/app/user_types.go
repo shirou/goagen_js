@@ -17,10 +17,14 @@ import (
 
 // userCreatePayload user type.
 type userCreatePayload struct {
-	Age   *int    `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
+	// age
+	Age *int `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
+	// email
 	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	Name  *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Sex   *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
+	// name
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// sex
+	Sex *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
 }
 
 // Validate validates the userCreatePayload type instance.
@@ -81,10 +85,14 @@ func (ut *userCreatePayload) Publicize() *UserCreatePayload {
 
 // UserCreatePayload user type.
 type UserCreatePayload struct {
-	Age   *int    `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
+	// age
+	Age *int `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
+	// email
 	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	Name  string  `form:"name" json:"name" xml:"name"`
-	Sex   *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
+	// name
+	Name string `form:"name" json:"name" xml:"name"`
+	// sex
+	Sex *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
 }
 
 // Validate validates the UserCreatePayload type instance.

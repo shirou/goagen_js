@@ -68,7 +68,7 @@ var _ = Resource("user", func() {
 		Routing(POST(""))
 		Payload(UserCreatePayload, func() {
 			Example(map[string]interface{}{
-				"price": 15000,
+				"name": "fooboo",
 			})
 		})
 		Response(OK)

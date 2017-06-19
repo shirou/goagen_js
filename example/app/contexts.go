@@ -40,10 +40,14 @@ func NewCreateUserContext(ctx context.Context, r *http.Request, service *goa.Ser
 
 // createUserPayload is the user create action payload.
 type createUserPayload struct {
-	Age   *int    `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
+	// age
+	Age *int `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
+	// email
 	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	Name  *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	Sex   *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
+	// name
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// sex
+	Sex *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
 }
 
 // Validate runs the validation rules defined in the design.
@@ -104,10 +108,14 @@ func (payload *createUserPayload) Publicize() *CreateUserPayload {
 
 // CreateUserPayload is the user create action payload.
 type CreateUserPayload struct {
-	Age   *int    `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
+	// age
+	Age *int `form:"age,omitempty" json:"age,omitempty" xml:"age,omitempty"`
+	// email
 	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-	Name  string  `form:"name" json:"name" xml:"name"`
-	Sex   *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
+	// name
+	Name string `form:"name" json:"name" xml:"name"`
+	// sex
+	Sex *string `form:"sex,omitempty" json:"sex,omitempty" xml:"sex,omitempty"`
 }
 
 // Validate runs the validation rules defined in the design.

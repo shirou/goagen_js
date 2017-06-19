@@ -12,8 +12,8 @@ declare class ErrorMap {
 }
 
 interface UserCreatePayload {
+  sex: ["male","female","other"];
   name: string;
   age: number;
   email: string;
-  sex: ["male","female","other"];
 }
