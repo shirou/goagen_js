@@ -22,7 +22,8 @@ export const UserCreate = {
      "name": {
        "kind": "string",
        "min_length": 4,
-       "max_length": 16
+       "max_length": 16,
+       "required": true
      },
      "sex": {
        "kind": "string",

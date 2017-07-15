@@ -76,21 +76,21 @@ func parseAction(action *design.ActionDefinition, target string) (ParamsDefiniti
 	}
 
 	if action.PathParams() != nil {
-		m := action.PathParams().Type.ToObject()
-		for a, att := range m {
+		m := action.PathParams()
+		for a, att := range m.Type.ToObject() {
 			ret.Path = append(ret.Path, newParam(action, target, a, att))
 			kind := convertTypeString(att.Type.Kind(), target)
-			ret.Validator.constraint[a] = parseConstraint(kind, att.Validation, att.IsRequired(a))
+			ret.Validator.constraint[a] = parseConstraint(kind, att.Validation, m.IsRequired(a))
 		}
 	}
 
 	if action.QueryParams != nil {
-		m := action.QueryParams.Type.ToObject()
+		m := action.QueryParams
 		pv := make(map[string]Constraint)
-		for a, att := range m {
+		for a, att := range m.Type.ToObject() {
 			kind := convertTypeString(att.Type.Kind(), target)
 			ret.Query = append(ret.Query, newParam(action, target, a, att))
-			pv[a] = parseConstraint(kind, att.Validation, att.IsRequired(a))
+			pv[a] = parseConstraint(kind, att.Validation, m.IsRequired(a))
 		}
 		if len(pv) > 0 {
 			ret.Validator.constraint["payload"] = pv
@@ -99,12 +99,12 @@ func parseAction(action *design.ActionDefinition, target string) (ParamsDefiniti
 
 	// Payload and Query are stored same Query field.
 	if action.Payload != nil {
-		m := action.Payload.Type.ToObject()
+		m := action.Payload
 		pv := make(map[string]Constraint)
-		for a, att := range m {
+		for a, att := range m.Type.ToObject() {
 			kind := convertTypeString(att.Type.Kind(), target)
 			ret.Query = append(ret.Query, newParam(action, target, a, att))
-			pv[a] = parseConstraint(kind, att.Validation, att.IsRequired(a))
+			pv[a] = parseConstraint(kind, att.Validation, m.IsRequired(a))
 		}
 		if len(pv) > 0 {
 			ret.Validator.constraint["payload"] = pv

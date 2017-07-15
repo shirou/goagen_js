@@ -44,8 +44,6 @@ func parseConstraint(kind string, o *dslengine.ValidationDefinition, required bo
 	ret := Constraint{
 		Kind: kind,
 	}
-	// TODO: IsRequired is not work.
-	// https://godoc.org/github.com/goadesign/goa/design#AttributeDefinition.IsRequired
 	if required {
 		ret.Required = &required
 	}
